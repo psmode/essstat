@@ -1,5 +1,4 @@
-# essstat
-<h2>TP-Link Easy Smart Switch port statistics</h2>
+# essstat - TP-Link Easy Smart Switch port statistics
 
 <a href="https://www.tp-link.com/us/business-networking/easy-smart-switch/">TP-Link Easy Smart Switches<a> are a family of managed switches capable of supporting QoS, VLANs and Link Aggregation Groups (LAGs).
 They are managed through a web based interface, giving access a number of functions, including basic packets counters per-port. 
@@ -11,32 +10,32 @@ This project has been tested against TP-Link switch models TL-SG1016DE and TL-SG
 members of this family, including the TL-SG105E and TL-SG1024DE.
 
 <hr>
-<h3>Technical Background</h3>
+## Technical Background
 
 <hr>
-<H3>Major Components</h3>
+## Major Components
 essstat.py is a lightweight utility is used to pull port statistics from the switch and output in a readily parsable format. Additional 
 code will be added to parse and either output or store these statistics.
 
 
-<h4>essstat.py</h4>
+### essstat.py
 This lightweight Python application performs a quick login through the switch's web based administrative interface, and then queries the 
 unit for the current port statistics. Credentials for accessing the unit are passed on the command line. The utility was coded with 
 Python &nbsp;3.6 and uses the <a href=”https://pypi.org/project/beautifulsoup4/”>Beautiful Soup</a> library.
 
-<h5>Usage<h5>
+####Usage
 <pre>
 essstat.py [-h] [-u TPuser] -p TPpswd [-d] TPhost
 </pre>
 
-<h5>Options</h5>
+####Options
 
-<h6>positional arguments:</h6>
+#####positional arguments:
 <pre>
   TPhost                IP address or hostname of switch
 </pre>
 
-</h6>optional arguments:</h6>
+#####optional arguments:
 <pre>
   -h, --help            show this help message and exit
   -u TPuser, --username TPuser
@@ -48,7 +47,7 @@ essstat.py [-h] [-u TPuser] -p TPpswd [-d] TPhost
 
 
 
-<h4>Zabbix Integration</h4>
+###Zabbix Integration
 
 
 <hr>
