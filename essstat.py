@@ -4,27 +4,28 @@
 # In[ ]:
 
 
-__author__ = “Peter Smode"
-__copyright__ = “Copyright 2020, Peter Smode”
-__credits__ = [“Peter Smode”]
-__license__ = “GPL 3.0”
-__version__ = “0.2.1”
-__maintainer__ = “Peter Smode”
-__email__ = “psmode@kitsnet.us”
-__status__ = “Beta”
+__author__ = "Peter Smode"
+__copyright__ = "Copyright 2020, Peter Smode"
+__credits__ = "Peter Smode"
+__license__ = "GPL 3.0"
+__version__ = "0.2.1"
+__maintainer__ = "Peter Smode"
+__email__ = "psmode@kitsnet.us"
+__status__ = "Beta"
 
 
 # In[3]:
 
 
-import argparse, requests, re, pprint
+import argparse, re, requests, pprint
+from datetime import datetime
 from bs4 import BeautifulSoup
 
 
 # In[4]:
 
 
-TPlinkStatus = {'0': "Link Down", '1': "LS 1", '2': "10M Half", '3': "LS 3", '4': "LS 4", '5': "100M Full", '6': "1000M Full"}
+TPlinkStatus = {'0': "Link Down", '1': "LS 1", '2': "10M Half", '3': "10M Full", '4': "LS 4", '5': "100M Full", '6': "1000M Full"}
 TPstate = {'0': 'Disabled', '1': 'Enabled'}
 
 
@@ -50,14 +51,16 @@ def isnotebook():
 if not isnotebook():
     parser = argparse.ArgumentParser(description='TP-Link Easy Smart Switch port statistics.')
     parser.add_argument('target', metavar='TPhost', help='IP address or hostname of switch')
-    parser.add_argument('-u', '--username', metavar='TPuser', required=False, default='admin', help='username for swtich access')
-    parser.add_argument('-p', '--password', metavar='TPpswd', required=True, help='password for swtich access')
     parser.add_argument('-d', '--debug', action='store_true', help='activate debugging output')
+    parser.add_argument('-p', '--password', metavar='TPpswd', required=True, help='password for swtich access')
+    parser.add_argument('-s', '--statsonly', action='store_true', help='output post statistics only')
+    parser.add_argument('-u', '--username', metavar='TPuser', required=False, default='admin', help='username for swtich access')
     args = vars(parser.parse_args())
-    
+
     TPLuser = args['username']
     TPLpswd = args['password']
     BASE_URL = "http://"+args['target']
+    TPLstatsonly = args['statsonly']
     TPLdebug = args['debug']
 
 
@@ -68,6 +71,7 @@ if isnotebook():
     TPLuser = 'admin'
     TPLpswd = 'changeme'
     BASE_URL = "http://"+"tpl-host"
+    TPLstatsonly = False
     TPLdebug = True
 
 
@@ -127,7 +131,6 @@ if str(r) != "<Response [200]>":
 
 # In[94]:
 
-
 pattern = re.compile(r"var (max_port_num) = (.*?);$", re.MULTILINE)
 
 
@@ -144,7 +147,9 @@ if TPLdebug:
 
 
 max_port_num = int(pattern.search(soup.script.text).group(2))
-print("max_port_num={0:d}".format(max_port_num))
+if not TPLstatsonly:
+   print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+   print("max_port_num={0:d}".format(max_port_num))
 
 
 # In[97]:
