@@ -43,6 +43,19 @@ Python &nbsp;3.6 and uses the <a href=”https://pypi.org/project/beautifulsoup4
     -u TPuser, --username TPuser
                           username for swtich access
 
+#### Example
+
+    [user@myhost ~]$ essstat.py myswitch -p ChangeMe
+    2020-03-28 11:25:15
+    max_port_num=8
+    1;Enabled;Link Down;0,0,0,0
+    2;Enabled;10M Full;3568644976,0,3144940915,0
+    3;Enabled;1000M Full;237232286,0,66662515,0
+    4;Enabled;1000M Full;4019260430,0,3721138807,0
+    5;Enabled;1000M Full;1300360968,0,355032522,0
+    6;Enabled;Link Down;0,0,0,0
+    7;Enabled;1000M Full;2903398648,0,4293632425,5
+    8;Enabled;Link Down;0,0,0,0
 
 
 ### Zabbix Integration
