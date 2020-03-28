@@ -1,7 +1,7 @@
 # essstat
 <h2>TP-Link Easy Smart Switch port statistics</h2>
 
-TP-Link Easy Smart Switches are a family of managed switches capable of supporting QoS, VLANs and Link Aggregation Groups (LAGs). 
+<a href="https://www.tp-link.com/us/business-networking/easy-smart-switch/">TP-Link Easy Smart Switches<a> are a family of managed switches capable of supporting QoS, VLANs and Link Aggregation Groups (LAGs).
 They are managed through a web based interface, giving access a number of functions, including basic packets counters per-port. 
 Unfortunately, these switches do not implement SNMP for access to these counters, nor do they appear to implement a discrete URL for
 direct access to this information. This utility addresses this issue to produce per-port statistics from a single command line invocation 
@@ -22,7 +22,7 @@ code will be added to parse and either output or store these statistics.
 <h4>essstat.py</h4>
 This lightweight Python application performs a quick login through the switch's web based administrative interface, and then queries the 
 unit for the current port statistics. Credentials for accessing the unit are passed on the command line. The utility was coded with 
-Python &nbsp;3.6 and uses the <a href=” https://pypi.org/project/beautifulsoup4/”>Beautiful Soup</a> library .
+Python &nbsp;3.6 and uses the <a href=”https://pypi.org/project/beautifulsoup4/”>Beautiful Soup</a> library.
 
 <h5>Usage<h5>
 <pre>
@@ -36,7 +36,7 @@ essstat.py [-h] [-u TPuser] -p TPpswd [-d] TPhost
   TPhost                IP address or hostname of switch
 </pre>
 
-</h6>optional arguments: </h6>
+</h6>optional arguments:</h6>
 <pre>
   -h, --help            show this help message and exit
   -u TPuser, --username TPuser
@@ -53,4 +53,4 @@ essstat.py [-h] [-u TPuser] -p TPpswd [-d] TPhost
 
 <hr>
 <b>Peter Smode</b><br>
-psmode [at] kitsnet.us
+<tt>psmode [at] kitsnet.us</tt>
