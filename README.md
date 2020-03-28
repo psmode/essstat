@@ -53,4 +53,4 @@ essstat.py [-h] [-u TPuser] -p TPpswd [-d] TPhost
 
 <hr>
 <b>Peter Smode</b><br>
-<tt>psmode [at] kitsnet.us</tt>
+<kbd>psmode [at] kitsnet.us</kbd>

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding: utf-8
 
 # In[ ]:
@@ -8,7 +8,7 @@ __author__ = “Peter Smode"
 __copyright__ = “Copyright 2020, Peter Smode”
 __credits__ = [“Peter Smode”]
 __license__ = “GPL 3.0”
-__version__ = “0.2.0”
+__version__ = “0.2.1”
 __maintainer__ = “Peter Smode”
 __email__ = “psmode@kitsnet.us”
 __status__ = “Beta”
