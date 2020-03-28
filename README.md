@@ -7,7 +7,7 @@ Unfortunately, these swtiches do not implement SNMP for access to these counters
 direct access to this information. This utility addresses this issue to produce per-port statistics from a single command line invoation 
 with output that can be trivially parsed for formatted output, orentered into a monitoring system like Zabbix.
 
-More to come....
+More to come...
 
 <b>Peter Smode</b><br>
 psmode [at] kitsnet.us
