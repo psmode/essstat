@@ -10,9 +10,13 @@ This project has been tested against TP-Link switch models TL-SG1016DE and TL-SG
 members of this family, including the TL-SG105E and TL-SG1024DE.
 
 <hr>
+
 ## Technical Background
+tbd
 
 <hr>
+
+
 ## Major Components
 essstat.py is a lightweight utility is used to pull port statistics from the switch and output in a readily parsable format. Additional 
 code will be added to parse and either output or store these statistics.
