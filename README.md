@@ -9,16 +9,13 @@ with output that can be trivially parsed for formatted output, or entered into a
 This project has been tested against TP-Link switch models TL-SG1016DE and TL-SG108E. It should also be compatible with the other 
 members of this family, including the TL-SG105E and TL-SG1024DE.
 
-<hr>
 
 ## Technical Background
 tbd
 
-<hr>
-
 
 ## Major Components
-essstat.py is a lightweight utility is used to pull port statistics from the switch and output in a readily parsable format. Additional 
+*essstat.py* is a lightweight utility is used to pull port statistics from the switch and output in a readily parsable format. Additional 
 code will be added to parse and either output or store these statistics.
 
 
@@ -28,30 +25,32 @@ unit for the current port statistics. Credentials for accessing the unit are pas
 Python &nbsp;3.6 and uses the <a href=”https://pypi.org/project/beautifulsoup4/”>Beautiful Soup</a> library.
 
 #### Usage
-    essstat.py [-h] [-u TPuser] -p TPpswd [-d] TPhost
-
+    essstat.py [-h] [-d] -p TPpswd [-s] [-u TPuser] TPhost
+    
 #### Options
 
 ##### positional arguments:
-<pre>
-  TPhost                IP address or hostname of switch
-</pre>
+
+    TPhost                IP address or hostname of switch
 
 ##### optional arguments:
-<pre>
-  -h, --help            show this help message and exit
-  -u TPuser, --username TPuser
-                        username for swtich access
-  -p TPpswd, --password TPpswd
-                        password for swtich access
-  -d, --debug           activate debugging output
-</pre>
+
+    -h, --help            show this help message and exit
+    -d, --debug           activate debugging output
+    -p TPpswd, --password TPpswd
+                          password for swtich access
+    -s, --statsonly       output post statistics only
+    -u TPuser, --username TPuser
+                          username for swtich access
 
 
 
 ### Zabbix Integration
 
 
-<hr>
-<b>Peter Smode</b><br>
+
+___
+
+**Peter Smode**
+
 `psmode [at] kitsnet.us`
