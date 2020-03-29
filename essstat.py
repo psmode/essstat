@@ -8,7 +8,7 @@ __author__ = "Peter Smode"
 __copyright__ = "Copyright 2020, Peter Smode"
 __credits__ = "Peter Smode"
 __license__ = "GPL 3.0"
-__version__ = "0.2.1"
+__version__ = "0.3.0"
 __maintainer__ = "Peter Smode"
 __email__ = "psmode@kitsnet.us"
 __status__ = "Beta"
@@ -17,7 +17,7 @@ __status__ = "Beta"
 # In[3]:
 
 
-import argparse, re, requests, pprint
+import argparse, pprint, re, requests, sys
 from datetime import datetime
 from bs4 import BeautifulSoup
 
@@ -51,6 +51,7 @@ def isnotebook():
 if not isnotebook():
     parser = argparse.ArgumentParser(description='TP-Link Easy Smart Switch port statistics.')
     parser.add_argument('target', metavar='TPhost', help='IP address or hostname of switch')
+    parser.add_argument('-1', '--1line', action='store_true', help='output in a single line')
     parser.add_argument('-d', '--debug', action='store_true', help='activate debugging output')
     parser.add_argument('-p', '--password', metavar='TPpswd', required=True, help='password for swtich access')
     parser.add_argument('-s', '--statsonly', action='store_true', help='output post statistics only')
@@ -61,6 +62,7 @@ if not isnotebook():
     TPLpswd = args['password']
     BASE_URL = "http://"+args['target']
     TPLstatsonly = args['statsonly']
+    TPL1line = args['1line']
     TPLdebug = args['debug']
 
 
@@ -72,6 +74,7 @@ if isnotebook():
     TPLpswd = 'changeme'
     BASE_URL = "http://"+"tpl-host"
     TPLstatsonly = False
+    TPL1line = False
     TPLdebug = True
 
 
@@ -95,7 +98,12 @@ s = requests.Session()
 
 data = {"logon": "Login", "username": TPLuser, "password": TPLpswd}
 headers = { 'Referer': f'{BASE_URL}/Logout.htm'}
-r = s.post(f'{BASE_URL}/logon.cgi', data=data, headers=headers, timeout=5)
+try:
+    r = s.post(f'{BASE_URL}/logon.cgi', data=data, headers=headers, timeout=5)
+except requests.exceptions.Timeout as errt:
+       sys.exit("ERROR: Timeout Error at login")
+except requests.exceptions.RequestException as err:
+       sys.exit("ERROR: General error at login: "+str(err))
 
 
 # In[90]:
@@ -126,7 +134,7 @@ if TPLdebug:
 
 
 if str(r) != "<Response [200]>":
-    sys.exit("Login failure")
+    sys.exit("ERROR: Login failure - bad credential?")
 
 
 # In[94]:
@@ -146,9 +154,10 @@ if TPLdebug:
 # In[117]:
 
 
+current_dt = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 max_port_num = int(pattern.search(soup.script.text).group(2))
-if not TPLstatsonly:
-   print(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+if not (TPLstatsonly or TPL1line):
+   print(current_dt)
    print("max_port_num={0:d}".format(max_port_num))
 
 
@@ -206,6 +215,14 @@ e5 = re.split(",", edict['pkts'])
 # In[122]:
 
 
+if TPL1line:
+	print(current_dt+"," + str(max_port_num)+",", end="")
+	output_format = "{0:d},{1:s},{2:s},{3:s},{4:s},{5:s},{6:s}"
+	myend = ","
+else:
+	output_format = "{0:d};{1:s};{2:s};{3:s},{4:s},{5:s},{6:s}"
+	myend = "\n"
+
 pdict = {}
 for x in range(1, max_port_num+1):
     #print(x, ((x-1)*4), ((x-1)*4)+1, ((x-1)*4)+2, ((x-1)*4)+3 )
@@ -216,15 +233,16 @@ for x in range(1, max_port_num+1):
     pdict[x]['TxBadPkt'] = e5[((x-1)*4)+1]
     pdict[x]['RxGoodPkt'] = e5[((x-1)*4)+2]
     pdict[x]['RxBadPkt'] = e5[((x-1)*4)+3]
-
-    print("{0:d};{1:s};{2:s};{3:s},{4:s},{5:s},{6:s}".format(x,
-                                                      pdict[x]['state'],
-                                                      pdict[x]['link_status'],
-                                                      pdict[x]['TxGoodPkt'],
-                                                      pdict[x]['TxBadPkt'],
-                                                      pdict[x]['RxGoodPkt'],
-                                                      pdict[x]['RxBadPkt']))
-    
+	
+    if (x == max_port_num):
+    	myend = "\n"
+    print(output_format.format(	x,
+								pdict[x]['state'],
+                                pdict[x]['link_status'],
+                                pdict[x]['TxGoodPkt'],
+                                pdict[x]['TxBadPkt'],
+                                pdict[x]['RxGoodPkt'],
+                                pdict[x]['RxBadPkt']), end=myend)
 
 
 # In[120]:
