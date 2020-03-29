@@ -11,17 +11,20 @@ members of this family, including the TL-SG105E and TL-SG1024DE.
 
 
 ## Major Components
+
 *essstat.py* is a lightweight utility is used to pull port statistics from the switch and output in a readily parsable format. Additional 
 code will be added to parse and either output or store these statistics.
 
 
 ### essstat.py
+
 This lightweight Python application performs a quick login through the switch's web based administrative interface, and then queries the 
 unit for the current port statistics. Credentials for accessing the unit are passed on the command line. The utility was coded with 
 Python &nbsp;3.6 and uses the <a href=”https://pypi.org/project/beautifulsoup4/”>Beautiful Soup</a> library.
 
 #### Usage
-    essstat.py [-h] [-d] -p TPpswd [-s] [-u TPuser] TPhost
+
+    essstat.py [-h] [-1] [-d] -p TPpswd [-s] [-u TPuser] TPhost
     
 #### Options
 
@@ -32,6 +35,7 @@ Python &nbsp;3.6 and uses the <a href=”https://pypi.org/project/beautifulsoup4
 ##### optional arguments:
 
     -h, --help            show this help message and exit
+    -1, --1line           output in a single line
     -d, --debug           activate debugging output
     -p TPpswd, --password TPpswd
                           password for swtich access
