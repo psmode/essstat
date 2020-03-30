@@ -20,7 +20,7 @@ code will be added to parse and either output or store these statistics.
 
 This lightweight Python application performs a quick login through the switch's web based administrative interface, and then queries the 
 unit for the current port statistics. Credentials for accessing the unit are passed on the command line. The utility was coded with 
-Python &nbsp;3.6 and uses the <a href=”https://pypi.org/project/beautifulsoup4/”>Beautiful Soup</a> library.
+Python &nbsp;3.6 and uses the [Beautiful Soup](https://pypi.org/project/beautifulsoup4/) library.
 
 #### Usage
 
@@ -45,7 +45,7 @@ Python &nbsp;3.6 and uses the <a href=”https://pypi.org/project/beautifulsoup4
 
 #### Example
 
-    [user@myhost ~]$ essstat.py myswitch -p ChangeMe
+    $ essstat.py myswitch -p ChangeMe
     2020-03-28 11:25:15
     max_port_num=8
     1;Enabled;Link Down;0,0,0,0
@@ -56,6 +56,57 @@ Python &nbsp;3.6 and uses the <a href=”https://pypi.org/project/beautifulsoup4
     6;Enabled;Link Down;0,0,0,0
     7;Enabled;1000M Full;2903398648,0,4293632425,5
     8;Enabled;Link Down;0,0,0,0
+
+
+### Accumulate Data in CSV
+
+The simplest way to accumulate data from the switches is to have *essstat.py* execute with the --1line option and
+append the output to a CSV file. You can then pull down a copy of the CSV file and process the raw data through
+this Excel workbook to produce a dynamic chart that will automatically rescale to the available data. 
+
+The first step is to setup a directory where the CSV files will accumulate the data. I chose to run all this under the 
+zabbix user that supports the monitoring application on this host. You may choose a different user, but just make sure 
+that the group of the directory matches the group of the user you will use.
+
+    $ ls -ald  /var/log/essstat
+    drwxrwxr-x. 2 root zabbix 68 Mar 30 10:56 /var/log/essstat
+
+Next, create the cron job(s) for periodic data collection. To do this, create the file `/etc/cron.d/essstat` and add
+one schedule for each switch you will monitor. To make this reasonably self-maintaining, include the current year as
+part of the CSV file specification.
+
+    */10 * * * *    zabbix  /usr/local/bin/essstat.py -1 -p ChangeMe1 orange >> /var/log/essstat/essstat-orange-`date +\%G`.csv
+    */10 * * * *    zabbix  /usr/local/bin/essstat.py -1 -p ChangeMe2 black >> /var/log/essstat/essstat-black-`date +\%G`.csv
+
+In the above example, there are two switches being monitored, named `orange` and `black`. For each switch, data collection
+will run every 10 minutes starting on each hour. The data for `orange` will be accumulated in the file
+`/var/log/essstat/essstat-orange-2020.csv` during the calendar year 2020. 
+
+
+### essstat-TPLhost.xlsx
+
+This Excel workbook prototype can be used to process a copy of the raw "one line" data output from *essstat.py* that has been
+accumulated in a CSV file. Start by copying the file to a new name, incorporating the name of the switch being 
+monitored. This will be the switch monitoring notebook. For example:
+
+    C:\user\me\Documents> copy essstat-TPLhost.xlsx essstat-orange.xlsx
+
+Next, download a copy of the [CSV data that has been accumulated on your monitoring host](#Accumulate-Data-in-CSV) and open it 
+in Excel, as well as the switch monitoring workbook. At this stage, you will need to copy the data from the CSV to the RawData tab
+of the switch monitoring notebook *by value*. To do this, go to the CSV file in Excel and select the top-left cell, `A1`. In Windows,
+you can use the key sequence `Ctrl-Shift-End` to select all the data, then press `Ctrl-Insert` to copy all of it. Then go to the switch
+monitoring workbook and select the first data cell in the **RawData** tab at `A2` (top-left cell, below the headings). Right click 
+and choose the option to paste values. With the raw data in place, you should scroll down to make note of the last populated row. The 
+original CSV file can now be closed.
+
+Click on the **PPS Table** tab to extend the analysis table and select the metric to be charted. The key is to extend the structured 
+table range to match the available **RawData**. Press `Ctrl-End` to locate the end of the table. Mouse over the tiny square at the 
+lower left corner of the cell until your mouse pointer changes to a crosshair. Click and drag down to the same row number as the last 
+populated row number in the **RawData** tab. All the formulae and ranges in **PPS Table** and **PPS Chart** will extend automatically.
+
+There are four metrics that are being tracked for each port: Tx Good Packets, Tx Bad Packets, Rx Good Pkts, and Rx Bad Pkts. The 
+dropdown at cell `B2` on the **PPS Table** tab is used to select which metric should be populated in the table and charted. 
+
 
 
 ### Zabbix Integration
