@@ -4,12 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
  
-## [0.3.1] - 2020-03-29
+## [0.3.2] - 2020-03-30
 
 ### Added
  - [essstat-TPLhost.xlsx] Excel workbook for charting statistics accumulated
  in a CSV file. See README.md for information about how to use this workbook
  as well as how to accumulate CSV data with a cron job.
+ - [essstat.cgi] A cgi script to use with the Apache httpd to support remote
+ query and retrieval from stored CSV files accumulating switch port
+ statistics.
 
 ### Changed
  - [essstat.py] Modified --1line output to use only numeric codes for 

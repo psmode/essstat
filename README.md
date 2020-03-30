@@ -60,7 +60,7 @@ Python &nbsp;3.6 and uses the [Beautiful Soup](https://pypi.org/project/beautifu
 
 ### Accumulate Data in CSV
 
-The simplest way to accumulate data from the switches is to have *essstat.py* execute with the --1line option and
+The simplest way to accumulate data from the switches is to have *essstat.py* execute with the `--1line` option and
 append the output to a CSV file. You can then pull down a copy of the CSV file and process the raw data through
 this Excel workbook to produce a dynamic chart that will automatically rescale to the available data. 
 
@@ -85,7 +85,7 @@ will run every 10 minutes starting on each hour. The data for `orange` will be a
 
 ### essstat-TPLhost.xlsx
 
-This Excel workbook prototype can be used to process a copy of the raw "one line" data output from *essstat.py* that has been
+This Excel workbook prototype can be used to process a copy of the raw `--1line` data output from *essstat.py* that has been
 accumulated in a CSV file. Start by copying the file to a new name, incorporating the name of the switch being 
 monitored. This will be the switch monitoring notebook. For example:
 
@@ -107,6 +107,26 @@ populated row number in the **RawData** tab. All the formulae and ranges in **PP
 There are four metrics that are being tracked for each port: Tx Good Packets, Tx Bad Packets, Rx Good Pkts, and Rx Bad Pkts. The 
 dropdown at cell `B2` on the **PPS Table** tab is used to select which metric should be populated in the table and charted. 
 
+
+### essstat.cgi
+
+This CGI script is used to query the [CSV data that has been accumulated on your monitoring host](#Accumulate-Data-in-CSV) and return 
+matching entries. The CGI is self-contained, relying only upon access to awk for execution of a simple inline script. There are three 
+variables implmented in the CGI:
+
+- esTPLhost: *(required)* The name of the switch as used to store the [accumulated CSV data](#Accumulate-Data-in-CSV).
+- esFrom: Return statistics starting with this date/time in format *yyyy-mm-dd&nbsp;HH:MM:SS*. Default value is for January 1st of the 
+current year.
+- esTo: Return statistics ending with this date/time in format *yyyy-mm-dd&nbsp;HH:MM:SS*. Default value is for all data to the current 
+date/time.
+
+Note that partial date/time specifications are allowed, since the matching entries are determined by a simple string comparison. The
+From and To dates are allowed to span across a year boundary (e.g. from 2019 to 2020). 
+
+To query the monitoring server for port statistics for the switch known as orange for the time range from 2/23/2020&nbsp;00:00 to 
+3/7/2020&nbsp;11:30, the URI would look like:
+
+    http://monitoring.mydomain.com/cgi-bin/essstat.cgi?esTPLhost=organge&esTo=2020-03-07%2011:30&esFrom=2020-02-23
 
 
 ### Zabbix Integration
