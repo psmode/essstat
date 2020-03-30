@@ -8,7 +8,7 @@ __author__ = "Peter Smode"
 __copyright__ = "Copyright 2020, Peter Smode"
 __credits__ = "Peter Smode"
 __license__ = "GPL 3.0"
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 __maintainer__ = "Peter Smode"
 __email__ = "psmode@kitsnet.us"
 __status__ = "Beta"
@@ -227,8 +227,12 @@ pdict = {}
 for x in range(1, max_port_num+1):
     #print(x, ((x-1)*4), ((x-1)*4)+1, ((x-1)*4)+2, ((x-1)*4)+3 )
     pdict[x] = {}
-    pdict[x]['state'] = TPstate[e3[x-1]]
-    pdict[x]['link_status'] = TPlinkStatus[e4[x-1]]
+    if TPL1line:
+    	pdict[x]['state'] = e3[x-1]
+    	pdict[x]['link_status'] = e4[x-1]
+    else:
+    	pdict[x]['state'] = TPstate[e3[x-1]]
+    	pdict[x]['link_status'] = TPlinkStatus[e4[x-1]]
     pdict[x]['TxGoodPkt'] = e5[((x-1)*4)]
     pdict[x]['TxBadPkt'] = e5[((x-1)*4)+1]
     pdict[x]['RxGoodPkt'] = e5[((x-1)*4)+2]
