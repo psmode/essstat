@@ -126,7 +126,7 @@ From and To dates are allowed to span across a year boundary (e.g. from 2019 to 
 To query the monitoring server for port statistics for the switch known as orange for the time range from 2/23/2020&nbsp;00:00 to 
 3/7/2020&nbsp;11:30, the URI would look like:
 
-    http://monitoring.mydomain.com/cgi-bin/essstat.cgi?esTPLhost=organge&esTo=2020-03-07%2011:30&esFrom=2020-02-23
+    http://monitoring.mydomain.com/cgi-bin/essstat.cgi?esTPLhost=orange&esTo=2020-03-07%2011:30&esFrom=2020-02-23
 
 
 ### Zabbix Integration
