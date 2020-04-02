@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
  
+## [0.4.0] = 2020-04-01
+
+### Added
+
+- [essstat.xlsm] Macro-enabled Excel workbook will automatically construct 
+a query and execute a web GET operation against the monitoring server using 
+the `essstat2.cgi` script. It uses the returned data to plot charts of the
+port statistics using dynaic chart ranges. 
+- [essstat2.cgi] This CGI script is designed to support operation of the essstat.xlsm
+Excel workbook. This script will return the average packets per second rate since 
+the previous record. 
+
+
 ## [0.3.2] - 2020-03-30
 
 ### Added

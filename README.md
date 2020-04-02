@@ -83,6 +83,17 @@ will run every 10 minutes starting on each hour. The data for `orange` will be a
 `/var/log/essstat/essstat-orange-2020.csv` during the calendar year 2020. 
 
 
+### essstat.xlsm
+
+This macro-enabled Excel workbook is probably the best way to read and chart the port statistics. The workbook will automatically construct a query and execute a web GET operation against the monitoring server using the [`essstat2.cgi`](#essstat2cgi) script. To configure the workbook for your local installation, the defined name `essstatBaseURL` must be modified to point to the webserver operating on your monitoring host and the name of the CGI script. To make this update in Excel 2019 on Windows, click the Excel **Formulas** tab, then click the `Name Manager` button on the ribbon. Click on the entry for `essstatBaseURL` and modify the entry to suit. Be sure to click the button with the green checkmark to save the modification, close the dialog and save the updated workbook. This needs to be done only once.
+
+When using the workbook, the name of the switch and the reporting from and to date/times are specified in the parameter table at the top left of the **WebData** tab. Click the `Update From Web` button to fetch the data into the table and dynamically update the plot on the **PPS Chart** tab. If the switch under study has only eight ports, the extra ports will be hidden automatically. 
+
+The name of the switch and the metric plotted appears in the title of the chart. Once the metrics have been loaded into the table, the different metrics may be loaded into the chart by selecting from the choices in the dropdown cell next to the ‘Chart metric` label. Moving between theses metrics for the same switch does *not* require doing another `Update From Web` operation.
+
+The table on the **LocalPortNames* tab allows you to override the default port names shown in the chart. This table is entirely optional and defining entries for all ports on a given switch is *not* required (it is perfectly fine to define port name overrides for just a couple ports for a given switch). If you have multiple switches, you can add entries for all of them in a single table.
+
+
 ### essstat-TPLhost.xlsx
 
 This Excel workbook prototype can be used to process a copy of the raw `--1line` data output from *essstat.py* that has been
@@ -129,9 +140,10 @@ To query the monitoring server for port statistics for the switch known as orang
     http://monitoring.mydomain.com/cgi-bin/essstat.cgi?esTPLhost=orange&esTo=2020-03-07%2011:30&esFrom=2020-02-23
 
 
-### Zabbix Integration
+### essstat2.cgi
 
-I am working on a configuration and supporting scripting to dump the stats into Zabbix for monitoring, reporting and event handling (e.g. alert or take action on Link Down events).
+This CGI script is designed to support operation of the [`essstat.xlsm`](#essstatxlsm) Excel workbook. The script supports the same query parameters as `essstat.cgi` and returns data for the same metrics. However, instead of returning raw packets counts in each record, `essstat2.cgi` will return the average packets per second rate since the previous record. The script will calculate the actual delta time between the current and previous record to ensure the rate is accurate. The script also has handling for individual counters resetting to zero as they wrap the maximum integer size for the counter. In such a case, the packet per second rate from the previous interval will be returned for the affected statistic.
+
 
 
 ## Technical Background
