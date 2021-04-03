@@ -4,11 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
  
-## Unreleased
+## [0.4.1] - 2021-04-03
 
 ### Fixed
 
 - [essstat.xlsm] Dynamic rescaling of X-axis labels and tickmarks
+- [essstat.py] Fix for Issue #3 reported by jan-lukes, AttributeError: 'NoneType' 
+object has no attribute 'group'. The problem was a code compatibility issue
+with newer versions of BeautifulSoup sometime after version 4.8.2. Changing 
+references to soup.script.text to soup.script.string fixes the problem and
+is backwards compatible, at least to beautifulsoup4-4.8.2.
 
 
 ## [0.4.0] - 2020-04-01

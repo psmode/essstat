@@ -5,10 +5,10 @@
 
 
 __author__ = "Peter Smode"
-__copyright__ = "Copyright 2020, Peter Smode"
+__copyright__ = "Copyright 2021, Peter Smode"
 __credits__ = "Peter Smode"
 __license__ = "GPL 3.0"
-__version__ = "0.3.1"
+__version__ = "0.4.1"
 __maintainer__ = "Peter Smode"
 __email__ = "psmode@kitsnet.us"
 __status__ = "Beta"
@@ -146,16 +146,16 @@ pattern = re.compile(r"var (max_port_num) = (.*?);$", re.MULTILINE)
 
 
 if TPLdebug:
-    print(pattern.search(soup.script.text).group(0))
-    print(pattern.search(soup.script.text).group(1))
-    print(pattern.search(soup.script.text).group(2))
+    print(pattern.search(soup.script.string).group(0))
+    print(pattern.search(soup.script.string).group(1))
+    print(pattern.search(soup.script.string).group(2))
 
 
 # In[117]:
 
 
 current_dt = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-max_port_num = int(pattern.search(soup.script.text).group(2))
+max_port_num = int(pattern.search(soup.script.string).group(2))
 if not (TPLstatsonly or TPL1line):
    print(current_dt)
    print("max_port_num={0:d}".format(max_port_num))
@@ -171,13 +171,13 @@ pattern2 = re.compile(r"var all_info = {\n?(.*?)\n?};$", re.MULTILINE | re.DOTAL
 
 
 if TPLdebug:
-    print(pattern2.search(soup.script.text).group(1))
+    print(pattern2.search(soup.script.string).group(1))
 
 
 # In[99]:
 
 
-entries = re.split(",?\n+", pattern2.search(soup.script.text).group(1))
+entries = re.split(",?\n+", pattern2.search(soup.script.string).group(1))
 
 
 # In[100]:
