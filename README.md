@@ -11,7 +11,7 @@ members of this family, including the TL-SG105E and TL-SG1024DE.
 
 ***
 <p align="center">
-<B>*** WARNING ***<B>
+<B>*** WARNING ***</B>
 </p>
 
 The Easy Smart Switch family has a number of unresolved vulnerabilities, including [CVE-2017-17746](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-17746). As described in [https://seclists.org/fulldisclosure/2017/Dec/67](https://seclists.org/fulldisclosure/2017/Dec/67), once a user from a given source IP address authenticates to the web-based management interface of the switch, any other user from that same source IP address is treated as authenticated. 
@@ -31,7 +31,7 @@ code will be added to parse and either output or store these statistics.
 
 This lightweight Python application performs a quick login through the switch's web based administrative interface, and then queries the 
 unit for the current port statistics. Credentials for accessing the unit are passed on the command line. The utility was coded with 
-Python &nbsp;3.6 and uses the [Beautiful Soup](https://pypi.org/project/beautifulsoup4/) library.
+Python&nbsp;3.6 and uses the [Beautiful Soup](https://pypi.org/project/beautifulsoup4/) library.
 
 #### Usage
 
