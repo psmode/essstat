@@ -49,10 +49,10 @@ Python&nbsp;3.6 and uses the [Beautiful Soup](https://pypi.org/project/beautiful
     -1, --1line           output in a single line
     -d, --debug           activate debugging output
     -p TPpswd, --password TPpswd
-                          password for swtich access
+                          password for switch access
     -s, --statsonly       output post statistics only
     -u TPuser, --username TPuser
-                          username for swtich access
+                          username for switch access
 
 #### Example
 
