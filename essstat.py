@@ -262,14 +262,14 @@ else:
 
 # In[25]:
 
-
-if TPL1line:
-#    print(current_dt+"," + str(max_port_num)+",", end="")
-    output_format = "{0:d},{1:s},{2:s},{3:s},{4:s},{5:s},{6:s}"
-    myend = ","
-else:
-    output_format = "{0:d};{1:s};{2:s};{3:s},{4:s},{5:s},{6:s}"
-    myend = "\n"
+if not TPLjson:
+    if TPL1line:
+        print(current_dt+"," + str(max_port_num)+",", end="")
+        output_format = "{0:d},{1:s},{2:s},{3:s},{4:s},{5:s},{6:s}"
+        myend = ","
+    else:
+        output_format = "{0:d};{1:s};{2:s};{3:s},{4:s},{5:s},{6:s}"
+        myend = "\n"
 
 pdict = {}
 jlist = []
