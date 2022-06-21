@@ -48,6 +48,7 @@ Python&nbsp;3.6 and uses the [Beautiful Soup](https://pypi.org/project/beautiful
     -h, --help            show this help message and exit
     -1, --1line           output in a single line
     -d, --debug           activate debugging output
+    -j, --json            output in JSON format
     -p TPpswd, --password TPpswd
                           password for switch access
     -s, --statsonly       output post statistics only

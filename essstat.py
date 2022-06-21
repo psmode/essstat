@@ -8,7 +8,7 @@ __author__ = "Peter Smode"
 __copyright__ = "Copyright 2021, Peter Smode"
 __credits__ = "Peter Smode"
 __license__ = "GPL 3.0"
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 __maintainer__ = "Peter Smode"
 __email__ = "psmode@kitsnet.us"
 __status__ = "Beta"
@@ -17,7 +17,7 @@ __status__ = "Beta"
 # In[2]:
 
 
-import argparse, pprint, re, requests, sys
+import argparse, pprint, re, requests, sys, json
 from datetime import datetime
 from bs4 import BeautifulSoup
 
@@ -53,6 +53,7 @@ if not isnotebook():
     parser.add_argument('target', metavar='TPhost', help='IP address or hostname of switch')
     parser.add_argument('-1', '--1line', action='store_true', help='output in a single line')
     parser.add_argument('-d', '--debug', action='store_true', help='activate debugging output')
+    parser.add_argument('-j', '--json', action='store_true', help='output in JSON format')
     parser.add_argument('-p', '--password', metavar='TPpswd', required=True, help='password for switch access')
     parser.add_argument('-s', '--statsonly', action='store_true', help='output post statistics only')
     parser.add_argument('-u', '--username', metavar='TPuser', required=False, default='admin', help='username for switch access')
@@ -63,6 +64,7 @@ if not isnotebook():
     BASE_URL = "http://"+args['target']
     TPLstatsonly = args['statsonly']
     TPL1line = args['1line']
+    TPLjson = args['json']
     TPLdebug = args['debug']
 
 
@@ -181,7 +183,7 @@ if convoluted:
     max_port_num = int(pattern.search(str(soup.head.find_all("script"))).group(2))
 else:
     max_port_num = int(pattern.search(str(soup.script)).group(2))
-if not (TPLstatsonly or TPL1line):
+if not (TPLstatsonly or TPL1line or TPLjson):
    print(current_dt)
    print("max_port_num={0:d}".format(max_port_num))
 
@@ -260,20 +262,21 @@ else:
 
 # In[25]:
 
-
-if TPL1line:
-    print(current_dt+"," + str(max_port_num)+",", end="")
-    output_format = "{0:d},{1:s},{2:s},{3:s},{4:s},{5:s},{6:s}"
-    myend = ","
-else:
-    output_format = "{0:d};{1:s};{2:s};{3:s},{4:s},{5:s},{6:s}"
-    myend = "\n"
+if not TPLjson:
+    if TPL1line:
+        print(current_dt+"," + str(max_port_num)+",", end="")
+        output_format = "{0:d},{1:s},{2:s},{3:s},{4:s},{5:s},{6:s}"
+        myend = ","
+    else:
+        output_format = "{0:d};{1:s};{2:s};{3:s},{4:s},{5:s},{6:s}"
+        myend = "\n"
 
 pdict = {}
+jlist = []
 for x in range(1, max_port_num+1):
     #print(x, ((x-1)*4), ((x-1)*4)+1, ((x-1)*4)+2, ((x-1)*4)+3 )
     pdict[x] = {}
-    if TPL1line:
+    if (TPL1line or TPLjson):
         pdict[x]['state'] = e3[x-1]
         pdict[x]['link_status'] = e4[x-1]
     else:
@@ -286,14 +289,24 @@ for x in range(1, max_port_num+1):
 
     if (x == max_port_num):
         myend = "\n"
-    print(output_format.format(x,
+
+    if TPLjson:
+        z = { **{"port": x}, **pdict[x] }
+        jlist.append( z )
+    else:
+        print(output_format.format(x,
                                 pdict[x]['state'],
                                 pdict[x]['link_status'],
                                 pdict[x]['TxGoodPkt'],
                                 pdict[x]['TxBadPkt'],
                                 pdict[x]['RxGoodPkt'],
                                 pdict[x]['RxBadPkt']), end=myend)
-
+if TPLjson:
+    for dict in jlist:
+        for key in dict:
+            dict[key] = int(dict[key])
+    json_object = json.dumps(jlist)
+    print(json_object)
 
 # In[26]:
 
