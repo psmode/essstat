@@ -1,2 +1,4 @@
 
 *.bak
+dist
+dist/*
