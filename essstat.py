@@ -53,9 +53,9 @@ if not isnotebook():
     parser.add_argument('target', metavar='TPhost', help='IP address or hostname of switch')
     parser.add_argument('-1', '--1line', action='store_true', help='output in a single line')
     parser.add_argument('-d', '--debug', action='store_true', help='activate debugging output')
+    parser.add_argument('-j', '--json', action='store_true', help='output in JSON format')
     parser.add_argument('-p', '--password', metavar='TPpswd', required=True, help='password for switch access')
     parser.add_argument('-s', '--statsonly', action='store_true', help='output post statistics only')
-    parser.add_argument('-j', '--json', action='store_true', help='output in JSON format')
     parser.add_argument('-u', '--username', metavar='TPuser', required=False, default='admin', help='username for switch access')
     args = vars(parser.parse_args())
 
