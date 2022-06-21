@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [0.6.0] - 2022-06-21
+
+### Added
+- [essstat.py] Added support for JSON output (by [robrankin(https://github.com/robrankin)]
+
+
 ## [0.5.0] - 2021-04-25
 
 ### Addeded
