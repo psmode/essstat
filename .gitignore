@@ -1,4 +1,4 @@
 
 *.bak
-dist
 dist/*
+dist
