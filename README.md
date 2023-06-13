@@ -69,6 +69,10 @@ Python&nbsp;3.6 and uses the [Beautiful Soup](https://pypi.org/project/beautiful
     7;Enabled;1000M Full;2903398648,0,4293632425,5
     8;Enabled;Link Down;0,0,0,0
 
+#### Docker Example
+
+    $ docker build -t essstat .
+    $ docker run --rm essstat myswitch -p ChangeMe
 
 ### Accumulate Data in CSV
 
