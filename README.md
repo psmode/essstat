@@ -6,7 +6,7 @@ Unfortunately, these switches do not implement SNMP for access to these counters
 direct access to this information. This project addresses this issue to produce per-port statistics from a single command line invocation 
 with output that can be trivially parsed for formatted output, or entered into a monitoring system like Zabbix.
 
-This project has been tested against TP-Link switch models TL-SG1016DE and TL-SG108E. It should also be compatible with the other 
+This project has been tested against TP-Link switch models TL-SG1016DE, TL-SG108E and TL-SG108PE. It should also be compatible with the other 
 members of this family, including the TL-SG105E and TL-SG1024DE.
 
 ***
