@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.7.0] - 2023-06-13
 
 ### Added
-- [essstat.py] Added Dockerfile by [robrankin](https://github.com/robrankin)
+- [requirements.txt] Added Dockerfile by [robrankin](https://github.com/robrankin)
 
 ## [0.6.0] - 2022-06-21
 
