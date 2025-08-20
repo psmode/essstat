@@ -1,0 +1,160 @@
+{
+  "zabbix_export": {
+    "version": "7.0",
+    "templates": [
+      {
+        "uuid": "550e8400e29b41d4a716446655440000",
+        "template": "TP-Link Easy Smart Switch",
+        "name": "TP-Link Easy Smart Switch",
+        "groups": [
+          { "name": "Templates" }
+        ],
+        "macros": [
+          { "macro": "{$SWITCH_USER}", "value": "admin" },
+          { "macro": "{$SWITCH_PWD}",  "value": "changeme" },
+          { "macro": "{$SWITCH_IP}",   "value": "{HOST.HOST}" }
+        ],
+        "discovery_rules": [
+          {
+            "uuid": "550e8400e29b41d4a716446655441001",
+            "name": "ESS Port Discovery",
+            "key": "essstat.discovery[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD}]",
+            "type": "ZABBIX_PASSIVE",
+            "delay": "1m",
+            "lifetime": "7d",
+            "item_prototypes": [
+              {
+                "uuid": "550e8400e29b41d4a716446655441006",
+                "name": "Port {#PORT} State",
+                "key": "essstat.port[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD},{#PORT},state]",
+                "type": "ZABBIX_PASSIVE",
+                "value_type": "UNSIGNED",
+                "delay": "1m",
+                "tags": [
+                  { "tag": "metric", "value": "State" },
+                  { "tag": "port",   "value": "{#PORT}" }
+                ]
+              },
+              {
+                "uuid": "550e8400e29b41d4a716446655441007",
+                "name": "Port {#PORT} Link Status",
+                "key": "essstat.port[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD},{#PORT},link_status]",
+                "type": "ZABBIX_PASSIVE",
+                "value_type": "UNSIGNED",
+                "delay": "1m",
+                "tags": [
+                  { "tag": "metric", "value": "LinkStatus" },
+                  { "tag": "port",   "value": "{#PORT}" }
+                ]
+              },
+              {
+                "uuid": "550e8400e29b41d4a716446655441002",
+                "name": "Port {#PORT} TxGoodPkt",
+                "key": "essstat.port[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD},{#PORT},TxGoodPkt]",
+                "type": "ZABBIX_PASSIVE",
+                "value_type": "FLOAT",
+                "delay": "1m",
+                "units": "pps",
+                "preprocessing": [
+                  { "type": "CHANGE_PER_SECOND", "parameters": [""] }
+                ],
+                "tags": [
+                  { "tag": "metric", "value": "TxGoodPkt" },
+                  { "tag": "port",   "value": "{#PORT}" }
+                ]
+              },
+              {
+                "uuid": "550e8400e29b41d4a716446655441003",
+                "name": "Port {#PORT} TxBadPkt",
+                "key": "essstat.port[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD},{#PORT},TxBadPkt]",
+                "type": "ZABBIX_PASSIVE",
+                "value_type": "FLOAT",
+                "delay": "1m",
+                "units": "pps",
+                "preprocessing": [
+                  { "type": "CHANGE_PER_SECOND", "parameters": [""] }
+                ],
+                "tags": [
+                  { "tag": "metric", "value": "TxBadPkt" },
+                  { "tag": "port",   "value": "{#PORT}" }
+                ]
+              },
+              {
+                "uuid": "550e8400e29b41d4a716446655441004",
+                "name": "Port {#PORT} RxGoodPkt",
+                "key": "essstat.port[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD},{#PORT},RxGoodPkt]",
+                "type": "ZABBIX_PASSIVE",
+                "value_type": "FLOAT",
+                "delay": "1m",
+                "units": "pps",
+                "preprocessing": [
+                  { "type": "CHANGE_PER_SECOND", "parameters": [""] }
+                ],
+                "tags": [
+                  { "tag": "metric", "value": "RxGoodPkt" },
+                  { "tag": "port",   "value": "{#PORT}" }
+                ]
+              },
+              {
+                "uuid": "550e8400e29b41d4a716446655441005",
+                "name": "Port {#PORT} RxBadPkt",
+                "key": "essstat.port[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD},{#PORT},RxBadPkt]",
+                "type": "ZABBIX_PASSIVE",
+                "value_type": "FLOAT",
+                "delay": "1m",
+                "units": "pps",
+                "preprocessing": [
+                  { "type": "CHANGE_PER_SECOND", "parameters": [""] }
+                ],
+                "tags": [
+                  { "tag": "metric", "value": "RxBadPkt" },
+                  { "tag": "port",   "value": "{#PORT}" }
+                ]
+              }
+            ],
+            "graph_prototypes": [
+              {
+                "uuid": "550e8400e29b41d4a716446655447001",
+                "name": "Port {#PORT} - ESS Packets",
+                "graph_items": [
+                  {
+                    "color": "00AA00",
+                    "calc_fnc": "ALL",
+                    "item": {
+                      "host": "TP-Link Easy Smart Switch",
+                      "key": "essstat.port[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD},{#PORT},TxGoodPkt]"
+                    }
+                  },
+                  {
+                    "color": "0000AA",
+                    "calc_fnc": "ALL",
+                    "item": {
+                      "host": "TP-Link Easy Smart Switch",
+                      "key": "essstat.port[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD},{#PORT},RxGoodPkt]"
+                    }
+                  },
+                  {
+                    "color": "AA0000",
+                    "calc_fnc": "ALL",
+                    "item": {
+                      "host": "TP-Link Easy Smart Switch",
+                      "key": "essstat.port[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD},{#PORT},TxBadPkt]"
+                    }
+                  },
+                  {
+                    "color": "AA00AA",
+                    "calc_fnc": "ALL",
+                    "item": {
+                      "host": "TP-Link Easy Smart Switch",
+                      "key": "essstat.port[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD},{#PORT},RxBadPkt]"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
