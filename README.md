@@ -6,7 +6,7 @@ Unfortunately, these switches do not implement SNMP for access to these counters
 direct access to this information. This project addresses this issue to produce per-port statistics from a single command line invocation 
 with output that can be trivially parsed for formatted output, or entered into a monitoring system like Zabbix.
 
-This project has been tested against TP-Link switch models TL-SG1016DE and TL-SG108E. It should also be compatible with the other 
+This project has been tested against TP-Link switch models TL-SG1016DE, TL-SG108E and TL-SG108PE. It should also be compatible with the other 
 members of this family, including the TL-SG105E and TL-SG1024DE.
 
 ***
@@ -69,6 +69,10 @@ Python&nbsp;3.6 and uses the [Beautiful Soup](https://pypi.org/project/beautiful
     7;Enabled;1000M Full;2903398648,0,4293632425,5
     8;Enabled;Link Down;0,0,0,0
 
+#### Docker Example
+
+    $ docker build -t essstat .
+    $ docker run --rm essstat myswitch -p ChangeMe
 
 ### Accumulate Data in CSV
 
