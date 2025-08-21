@@ -6,13 +6,23 @@
         "uuid": "550e8400e29b41d4a716446655440000",
         "template": "TP-Link Easy Smart Switch",
         "name": "TP-Link Easy Smart Switch",
-        "groups": [
-          { "name": "Templates" }
-        ],
+        "groups": [{ "name": "Templates" }],
         "macros": [
           { "macro": "{$SWITCH_USER}", "value": "admin" },
           { "macro": "{$SWITCH_PWD}",  "value": "changeme" },
           { "macro": "{$SWITCH_IP}",   "value": "{HOST.HOST}" }
+        ],
+        "items": [
+          {
+            "uuid": "550e8400e29b41d4a716446655442000",
+            "name": "ESS CSV single line",
+            "key": "essstat.1line[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD}]",
+            "type": "ZABBIX_PASSIVE",
+            "value_type": "TEXT",
+            "delay": "1m",
+            "history": "1d",
+            "description": "One CSV line: ts,port_count,(port,state,link_status,TxGoodPkt,TxBadPkt,RxGoodPkt,RxBadPkt)*"
+          }
         ],
         "discovery_rules": [
           {
@@ -20,42 +30,67 @@
             "name": "ESS Port Discovery",
             "key": "essstat.discovery[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD}]",
             "type": "ZABBIX_PASSIVE",
-            "delay": "1m",
+            "delay": "5m",
             "lifetime": "7d",
             "item_prototypes": [
               {
-                "uuid": "550e8400e29b41d4a716446655441006",
+                "uuid": "550e8400e29b41d4a716446655441206",
                 "name": "Port {#PORT} State",
-                "key": "essstat.port[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD},{#PORT},state]",
-                "type": "ZABBIX_PASSIVE",
+                "key": "essstat.value[{#PORT},state]",
+                "type": "DEPENDENT",
+                "master_item": { "key": "essstat.1line[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD}]" },
                 "value_type": "UNSIGNED",
-                "delay": "1m",
+                "delay": "0",
+                "preprocessing": [
+                  {
+                    "type": "JAVASCRIPT",
+                    "parameters": [
+                      "var p='{#PORT}';\nvar a=value.trim().split(',');\nif(a.length<3) return null;\nfor(var i=2;i+6<a.length;i+=7){ if(a[i]===String(p)) return a[i+1]; }\nreturn null;"
+                    ]
+                  }
+                ],
                 "tags": [
                   { "tag": "metric", "value": "State" },
                   { "tag": "port",   "value": "{#PORT}" }
                 ]
               },
               {
-                "uuid": "550e8400e29b41d4a716446655441007",
+                "uuid": "550e8400e29b41d4a716446655441207",
                 "name": "Port {#PORT} Link Status",
-                "key": "essstat.port[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD},{#PORT},link_status]",
-                "type": "ZABBIX_PASSIVE",
+                "key": "essstat.value[{#PORT},link_status]",
+                "type": "DEPENDENT",
+                "master_item": { "key": "essstat.1line[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD}]" },
                 "value_type": "UNSIGNED",
-                "delay": "1m",
+                "delay": "0",
+                "preprocessing": [
+                  {
+                    "type": "JAVASCRIPT",
+                    "parameters": [
+                      "var p='{#PORT}';\nvar a=value.trim().split(',');\nif(a.length<3) return null;\nfor(var i=2;i+6<a.length;i+=7){ if(a[i]===String(p)) return a[i+2]; }\nreturn null;"
+                    ]
+                  }
+                ],
                 "tags": [
                   { "tag": "metric", "value": "LinkStatus" },
                   { "tag": "port",   "value": "{#PORT}" }
                 ]
               },
               {
-                "uuid": "550e8400e29b41d4a716446655441002",
+                "uuid": "550e8400e29b41d4a716446655441202",
                 "name": "Port {#PORT} TxGoodPkt",
-                "key": "essstat.port[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD},{#PORT},TxGoodPkt]",
-                "type": "ZABBIX_PASSIVE",
+                "key": "essstat.value[{#PORT},TxGoodPkt]",
+                "type": "DEPENDENT",
+                "master_item": { "key": "essstat.1line[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD}]" },
                 "value_type": "FLOAT",
-                "delay": "1m",
+                "delay": "0",
                 "units": "pps",
                 "preprocessing": [
+                  {
+                    "type": "JAVASCRIPT",
+                    "parameters": [
+                      "var p='{#PORT}';\nvar a=value.trim().split(',');\nif(a.length<3) return null;\nfor(var i=2;i+6<a.length;i+=7){ if(a[i]===String(p)) return a[i+3]; }\nreturn null;"
+                    ]
+                  },
                   { "type": "CHANGE_PER_SECOND", "parameters": [""] }
                 ],
                 "tags": [
@@ -64,14 +99,21 @@
                 ]
               },
               {
-                "uuid": "550e8400e29b41d4a716446655441003",
+                "uuid": "550e8400e29b41d4a716446655441203",
                 "name": "Port {#PORT} TxBadPkt",
-                "key": "essstat.port[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD},{#PORT},TxBadPkt]",
-                "type": "ZABBIX_PASSIVE",
+                "key": "essstat.value[{#PORT},TxBadPkt]",
+                "type": "DEPENDENT",
+                "master_item": { "key": "essstat.1line[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD}]" },
                 "value_type": "FLOAT",
-                "delay": "1m",
+                "delay": "0",
                 "units": "pps",
                 "preprocessing": [
+                  {
+                    "type": "JAVASCRIPT",
+                    "parameters": [
+                      "var p='{#PORT}';\nvar a=value.trim().split(',');\nif(a.length<3) return null;\nfor(var i=2;i+6<a.length;i+=7){ if(a[i]===String(p)) return a[i+4]; }\nreturn null;"
+                    ]
+                  },
                   { "type": "CHANGE_PER_SECOND", "parameters": [""] }
                 ],
                 "tags": [
@@ -80,14 +122,21 @@
                 ]
               },
               {
-                "uuid": "550e8400e29b41d4a716446655441004",
+                "uuid": "550e8400e29b41d4a716446655441204",
                 "name": "Port {#PORT} RxGoodPkt",
-                "key": "essstat.port[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD},{#PORT},RxGoodPkt]",
-                "type": "ZABBIX_PASSIVE",
+                "key": "essstat.value[{#PORT},RxGoodPkt]",
+                "type": "DEPENDENT",
+                "master_item": { "key": "essstat.1line[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD}]" },
                 "value_type": "FLOAT",
-                "delay": "1m",
+                "delay": "0",
                 "units": "pps",
                 "preprocessing": [
+                  {
+                    "type": "JAVASCRIPT",
+                    "parameters": [
+                      "var p='{#PORT}';\nvar a=value.trim().split(',');\nif(a.length<3) return null;\nfor(var i=2;i+6<a.length;i+=7){ if(a[i]===String(p)) return a[i+5]; }\nreturn null;"
+                    ]
+                  },
                   { "type": "CHANGE_PER_SECOND", "parameters": [""] }
                 ],
                 "tags": [
@@ -96,14 +145,21 @@
                 ]
               },
               {
-                "uuid": "550e8400e29b41d4a716446655441005",
+                "uuid": "550e8400e29b41d4a716446655441205",
                 "name": "Port {#PORT} RxBadPkt",
-                "key": "essstat.port[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD},{#PORT},RxBadPkt]",
-                "type": "ZABBIX_PASSIVE",
+                "key": "essstat.value[{#PORT},RxBadPkt]",
+                "type": "DEPENDENT",
+                "master_item": { "key": "essstat.1line[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD}]" },
                 "value_type": "FLOAT",
-                "delay": "1m",
+                "delay": "0",
                 "units": "pps",
                 "preprocessing": [
+                  {
+                    "type": "JAVASCRIPT",
+                    "parameters": [
+                      "var p='{#PORT}';\nvar a=value.trim().split(',');\nif(a.length<3) return null;\nfor(var i=2;i+6<a.length;i+=7){ if(a[i]===String(p)) return a[i+6]; }\nreturn null;"
+                    ]
+                  },
                   { "type": "CHANGE_PER_SECOND", "parameters": [""] }
                 ],
                 "tags": [
@@ -120,34 +176,22 @@
                   {
                     "color": "00AA00",
                     "calc_fnc": "ALL",
-                    "item": {
-                      "host": "TP-Link Easy Smart Switch",
-                      "key": "essstat.port[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD},{#PORT},TxGoodPkt]"
-                    }
+                    "item": { "host": "TP-Link Easy Smart Switch", "key": "essstat.value[{#PORT},TxGoodPkt]" }
                   },
                   {
                     "color": "0000AA",
                     "calc_fnc": "ALL",
-                    "item": {
-                      "host": "TP-Link Easy Smart Switch",
-                      "key": "essstat.port[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD},{#PORT},RxGoodPkt]"
-                    }
+                    "item": { "host": "TP-Link Easy Smart Switch", "key": "essstat.value[{#PORT},RxGoodPkt]" }
                   },
                   {
                     "color": "AA0000",
                     "calc_fnc": "ALL",
-                    "item": {
-                      "host": "TP-Link Easy Smart Switch",
-                      "key": "essstat.port[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD},{#PORT},TxBadPkt]"
-                    }
+                    "item": { "host": "TP-Link Easy Smart Switch", "key": "essstat.value[{#PORT},TxBadPkt]" }
                   },
                   {
                     "color": "AA00AA",
                     "calc_fnc": "ALL",
-                    "item": {
-                      "host": "TP-Link Easy Smart Switch",
-                      "key": "essstat.port[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD},{#PORT},RxBadPkt]"
-                    }
+                    "item": { "host": "TP-Link Easy Smart Switch", "key": "essstat.value[{#PORT},RxBadPkt]" }
                   }
                 ]
               }
