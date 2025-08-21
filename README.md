@@ -97,14 +97,14 @@ it. Once it is in place, restart the zabbix-agent2 service so that the file will
 
 #### Create a new switch host (repeat per switch)
 1) Add host
- - **Configuration** → **Hosts** → **Create host**
- -- Host name: use the switch name or IP (your choice)
- -- Groups: pick an appropriate host group (e.g., “Network/Switches”)
+  * **Configuration** → **Hosts** → **Create host**
+   * Host name: use the switch name or IP (your choice)
+   * Groups: pick an appropriate host group (e.g., “Network/Switches”)
 1) Interface (important)
- - Add a Zabbix agent interface that points to the Zabbix server’s agent, not the switch:
- -- DNS/IP: 127.0.0.1 (or the Zabbix server’s IP)
- -- Port: 10050
- - Rationale: the server polls its own agent, which runs your script and reaches the switch using the key parameters.
+  * Add a Zabbix agent interface that points to the Zabbix server’s agent, not the switch:
+   * DNS/IP: 127.0.0.1 (or the Zabbix server’s IP)
+   * Port: 10050
+  * Rationale: the server polls its own agent, which runs your script and reaches the switch using the key parameters.
 1) Link the template
  - **Templates** → **Select** → choose `Template ESS Switch`
 1) Set host-level macros
