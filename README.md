@@ -97,22 +97,22 @@ it. Once it is in place, restart the zabbix-agent2 service so that the file will
 
 #### Create a new switch host (repeat per switch)
 1. Add host
-  + **Configuration** → **Hosts** → **Create host**
-    + Host name: use the switch name or IP (your choice)
-    + Groups: pick an appropriate host group (e.g., “Network/Switches”)
+    + **Configuration** → **Hosts** → **Create host**
+      + Host name: use the switch name or IP (your choice)
+      + Groups: pick an appropriate host group (e.g., “Network/Switches”)
 1. Interface (important)
-  + Add a Zabbix agent interface that points to the Zabbix server’s agent, not the switch:
-    + DNS/IP: 127.0.0.1 (or the Zabbix server’s IP)
-    + Port: 10050
-  + Rationale: the server polls its own agent, which runs your script and reaches the switch using the key parameters.
+    + Add a Zabbix agent interface that points to the Zabbix server’s agent, not the switch:
+      + DNS/IP: 127.0.0.1 (or the Zabbix server’s IP)
+      + Port: 10050
+    + Rationale: the server polls its own agent, which runs your script and reaches the switch using the key parameters.
 1. Link the template
- - **Templates** → **Select** → choose `Template ESS Switch`
+    + **Templates** → **Select** → choose `Template ESS Switch`
 1. Set host-level macros
- - **Macros tab** → **Add:**
- -- {$SWITCH_IP} = <switch management IP or FQDN>
+    + **Macros tab** → **Add:**
+      + {$SWITCH_IP} = <switch management IP or FQDN>
 (If you prefer, you can leave {$SWITCH_IP} blank and set it to {HOST.HOST}, provided the host name is the switch’s resolvable name/IP.)
- -- {$SWITCH_USER} = admin (only need define this if not the default of `admin`
- -- {$SWITCH_PWD} = •••••• (the real password)
+      + {$SWITCH_USER} = admin (only need define this if not the default of `admin`
+      + {$SWITCH_PWD} = •••••• (the real password)
 1. Save
 
 ### Accumulate Data in CSV
