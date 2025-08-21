@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.8.0] - 2025-08-20
+
+### Added
+- [Template_essstat.json] Added Zabbix template for automated switch monitoring. When
+linked to a suitably profiles Host definition in Zabbix, the template will support 
+low level discovery (LLD) of the ports and metrics. The template will also create 
+per-port graphs which will pull together all metrics for a given port in a single 
+graph. Note that at this time, the method used to populate the port metrics is terribly
+inefficient and will need to be improved, probably leveraging dependent items.
+- [essstat.conf] Required to define UserParameter settings for execution of the script
+by Zabbix Agent 2. This file needs to be placed in /etc/zabbix/zabbix_agent2.d/
+
+### Changed
+- [essstat.py] New processing options have been defined:
+-- -l, --lld     output in Zabbix Low-Level Discovery JSON format
+-- -m, --metric  metric name for specific port (state, link_status, TxGoodPkt, TxBadPkt, RxGoodPkt, RxBadPkt)
+-- -p, --port    specific port number to retrieve
+
+
 ## [0.7.0] - 2023-06-13
 
 ### Added
@@ -18,9 +37,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [0.5.0] - 2021-04-25
 
 ### Addeded
- - [essstat.py] Added propper support for TL-SG1024DE model as per Issue #4.
+ - [essstat.py] Added proper support for TL-SG1024DE model as per Issue #4.
 Many thanks to @FreedThx for his report and for providing the output from
-that model that enabled the devlopment of this code change.
+that model that enabled the development of this code change.
 
 
 ## [0.4.1] - 2021-04-03

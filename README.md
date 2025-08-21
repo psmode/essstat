@@ -35,7 +35,7 @@ Python&nbsp;3.6 and uses the [Beautiful Soup](https://pypi.org/project/beautiful
 
 #### Usage
 
-    essstat.py [-h] [-1] [-d] -p TPpswd [-s] [-u TPuser] TPhost
+    essstat.py [-h] [-1] [-d] [-j] [-l] -p TPpswd [-u TPuser] [-s] [--port PORT] [--metric METRIC] TPhost
     
 #### Options
 
@@ -49,11 +49,15 @@ Python&nbsp;3.6 and uses the [Beautiful Soup](https://pypi.org/project/beautiful
     -1, --1line           output in a single line
     -d, --debug           activate debugging output
     -j, --json            output in JSON format
+    -l, --lld             output in Zabbix Low-Level Discovery JSON format
     -p TPpswd, --password TPpswd
                           password for switch access
     -s, --statsonly       output post statistics only
     -u TPuser, --username TPuser
                           username for switch access
+    --port PORT           specific port number to retrieve
+    --metric METRIC       metric name for specific port (state, link_status, TxGoodPkt, TxBadPkt, RxGoodPkt, RxBadPkt)
+
 
 #### Example
 
@@ -74,9 +78,46 @@ Python&nbsp;3.6 and uses the [Beautiful Soup](https://pypi.org/project/beautiful
     $ docker build -t essstat .
     $ docker run --rm essstat myswitch -p ChangeMe
 
+### Zabbix Integration
+
+Zabbix integration has been developed and tested with Zabbix 7.0 LTS. The approach used is to leverage the Zabbix Agent 2 
+on the Zabbix server to execute the data retrieval from the switch. To support this, `Template_essstat.json` has been created
+to facilitate discovery and automatic creation of monitored items and graphs. Multiple switches may be monitored under separate 
+Zabbix host definitions. 
+
+#### Import template
+Import the JSON file to establish the template definition in Zabbix. In Zabbix 7.0, login with administrative privileges and navigate
+to **Data Collection** → **Templates**, then click the **Import** button to start the process. See the 
+[Templates](https://www.zabbix.com/documentation/current/en/manual/xml_export_import/templates) section in the Zabbix manual for more 
+information.
+
+#### Define `UserParameter` for Zabbix Agent2
+Place the `essstat.conf` file in directory `/etc/zabbix/zabbix_agent2.d/` with protection so that the Zabbix Agent 2 process can read
+it. Once it is in place, restart the zabbix-agent2 service so that the file will be read. 
+
+#### Create a new switch host (repeat per switch)
+1. Add host
+ - **Configuration** → **Hosts** → **Create host**
+ -- Host name: use the switch name or IP (your choice)
+ -- Groups: pick an appropriate host group (e.g., “Network/Switches”)
+1. Interface (important)
+ - Add a Zabbix agent interface that points to the Zabbix server’s agent, not the switch:
+ -- DNS/IP: 127.0.0.1 (or the Zabbix server’s IP)
+ -- Port: 10050
+ - Rationale: the server polls its own agent, which runs your script and reaches the switch using the key parameters.
+1. Link the template
+ - **Templates** → **Select** → choose `Template ESS Switch`
+1. Set host-level macros
+ - **Macros tab** → **Add:**
+ -- {$SWITCH_IP} = <switch management IP or FQDN>
+(If you prefer, you can leave {$SWITCH_IP} blank and set it to {HOST.HOST}, provided the host name is the switch’s resolvable name/IP.)
+ -- {$SWITCH_USER} = admin (only need define this if not the default of `admin`
+ -- {$SWITCH_PWD} = •••••• (the real password)
+1. Save
+
 ### Accumulate Data in CSV
 
-The simplest way to accumulate data from the switches is to have *essstat.py* execute with the `--1line` option and
+A simple way to accumulate data from the switches is to have *essstat.py* execute with the `--1line` option and
 append the output to a CSV file. You can then pull down a copy of the CSV file and process the raw data through
 this Excel workbook to produce a dynamic chart that will automatically rescale to the available data. 
 
@@ -101,7 +142,7 @@ will run every 10 minutes starting on each hour. The data for `orange` will be a
 
 ### essstat.xlsm
 
-This macro-enabled Excel workbook is probably the best way to read and chart the port statistics. The workbook will automatically construct a query and execute a web GET operation against the monitoring server using the [`essstat2.cgi`](#essstat2cgi) script. To configure the workbook for your local installation, the defined name `essstatBaseURL` must be modified to point to the webserver operating on your monitoring host and the name of the CGI script. To make this update in Excel 2019 on Windows, click the Excel **Formulas** tab, then click the `Name Manager` button on the ribbon. Click on the entry for `essstatBaseURL` and modify the entry to suit. Be sure to click the button with the green checkmark to save the modification, close the dialog and save the updated workbook. This needs to be done only once.
+This macro-enabled Excel workbook is a way to read and chart the port statistics. The workbook will automatically construct a query and execute a web GET operation against the monitoring server using the [`essstat2.cgi`](#essstat2cgi) script. To configure the workbook for your local installation, the defined name `essstatBaseURL` must be modified to point to the webserver operating on your monitoring host and the name of the CGI script. To make this update in Excel 2019 on Windows, click the Excel **Formulas** tab, then click the `Name Manager` button on the ribbon. Click on the entry for `essstatBaseURL` and modify the entry to suit. Be sure to click the button with the green checkmark to save the modification, close the dialog and save the updated workbook. This needs to be done only once.
 
 When using the workbook, the name of the switch and the reporting from and to date/times are specified in the parameter table at the top left of the **WebData** tab. Click the `Update From Web` button to fetch the data into the table and dynamically update the plot on the **PPS Chart** tab. If the switch under study has only eight ports, the extra ports will be hidden automatically. 
 
@@ -170,7 +211,7 @@ First, a little background on the UDP-base Easy Smart Configuration Protocol (ES
 
 This design and implementation has a number of issues that should cause some concern which have been highlighted by security researchers ([@chrisdcmoore]( https://twitter.com/chrisdcmoore) in [Information disclosure vulnerability in TP-Link Easy Smart switches](https://www.chrisdcmoore.co.uk/post/tplink-easy-smart-switch-vulnerabilities/) and [@chmod7850](https://twitter.com/chmod750) in [Vulnerability disclosure TP-Link multiples CVEs](https://chmod750.wordpress.com/2017/04/23/vulnerability-disclosure-tp-link/)). While hacking into the ESCP would be easy enough, I really did not like the idea of literally broadcasting credentials across the network on a regular basis to grab statistics.
 
-The apprach that this project does use, the web-based client, is problematic as well. Using a TCP unicast connections is better, but SSL is not implemented by the switch. While it is possible to reconfigure the switch to use a different administrative username, there is only one username for accessing the switch. This precludes employing role-based access with a dedicated username for reading statistics only. The credential we use to grab the statistics could also be used to access the management interface allowing resetting of counters, reconfiguring the switch or even replacing the firmware. 
+The approach that this project does use, the web-based client, is problematic as well. Using a TCP unicast connections is better, but SSL is not implemented by the switch. While it is possible to reconfigure the switch to use a different administrative username, there is only one username for accessing the switch. This precludes employing role-based access with a dedicated username for reading statistics only. The credential we use to grab the statistics could also be used to access the management interface allowing resetting of counters, reconfiguring the switch or even replacing the firmware. 
 
 **Worse still are the vulnerabilities reported in [CVE-2017-17746](https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2017-17746)**. As described in [https://seclists.org/fulldisclosure/2017/Dec/67](https://seclists.org/fulldisclosure/2017/Dec/67), once a user from a given source IP address authenticates to the web-based management interface of the switch, any other user from that same source IP address is treated as authenticated. This condition is created by the execution of the Python scripts in this project, where other users logged into or tunneling through the same host would then have unauthenticated access to the management interface of the switch. This problem can be mitigated by running the scripts from a dedicated management host. Use of a dedicated out-of-band management LAN could offer protection as well, but these switches are unlikely to be used in such an elaborately structured environment.
 
