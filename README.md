@@ -112,12 +112,15 @@ it. Once it is in place, restart the zabbix-agent2 service so that the file will
 
 1. Set host-level macros  
     - **Macros tab** → **Add:**  
-        - `{$SWITCH_IP}` = <switch management IP or FQDN>  
+        - `{$SWITCH_IP}` = _switch management IP_ or _FQDN_ 
           (If you prefer, you can leave `{$SWITCH_IP}` blank and set it to `{HOST.HOST}`, provided the host name is the switch’s resolvable name/IP.)  
         - `{$SWITCH_USER}` = admin (only need to define this if not the default of `admin`)  
         - `{$SWITCH_PWD}` = •••••• (the real password)  
 
 1. Save
+
+It may take a few minutes for the LLD to fire and the items and graphs to be created. Multiple switches my be monitored by 
+creating multiple hosts in Zabbix. Just be sure to set the Macros for each host correctly. 
 
 ### Accumulate Data in CSV
 
