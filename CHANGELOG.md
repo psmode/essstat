@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.8.1] - 2025-08-21
+
+### Changed
+- [Template_essstat.json] Modified template to collect all switch port metrics 
+in a single poll, then break out the per-port metrics as dependent items in 
+Zabbix.
+- [essstat.conf] Additional UserParameter to support collecting all switch port
+metrics with the --1line argument
+
+
 ## [0.8.0] - 2025-08-20
 
 ### Added
