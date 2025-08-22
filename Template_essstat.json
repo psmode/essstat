@@ -35,7 +35,7 @@
             "delay": "{$ESS_INFO_INTERVAL}",
             "history": "7d",
             "trends": "0",
-            "description": "System info via --info --lld; expects {\"data\":[{\"{#DESCRISTR}\":...,\"{#MACSTR}\":...,\"{#IPSTR}\":...,\"{#NETMASKSTR}\":...,\"{#GATEWAYSTR}\":...,\"{#FIRMWARESTR}\":...,\"{#HARDWARESTR}\":...}]}"
+            "description": "System info via --info --lld"
           },
           {
             "uuid": "550e8400e29b41d4a716446655443101",
@@ -45,11 +45,8 @@
             "value_type": "TEXT",
             "delay": "0",
             "master_item": { "key": "essstat.info[{$ESS_IP},{$ESS_USER},{$ESS_PWD}]" },
-            "preprocessing": [
-              { "type": "JSONPATH", "parameters": ["$['data'][0]['{#DESCRISTR}']"] }
-            ],
-            "inventory_link": "NAME",
-            "tags": [{ "tag": "info", "value": "descriStr" }]
+            "preprocessing": [{ "type": "JSONPATH", "parameters": ["$['data'][0]['{#DESCRISTR}']"] }],
+            "inventory_link": "NAME"
           },
           {
             "uuid": "550e8400e29b41d4a716446655443102",
@@ -59,11 +56,8 @@
             "value_type": "TEXT",
             "delay": "0",
             "master_item": { "key": "essstat.info[{$ESS_IP},{$ESS_USER},{$ESS_PWD}]" },
-            "preprocessing": [
-              { "type": "JSONPATH", "parameters": ["$['data'][0]['{#MACSTR}']"] }
-            ],
-            "inventory_link": "MACADDRESS_A",
-            "tags": [{ "tag": "info", "value": "macStr" }]
+            "preprocessing": [{ "type": "JSONPATH", "parameters": ["$['data'][0]['{#MACSTR}']"] }],
+            "inventory_link": "MACADDRESS_A"
           },
           {
             "uuid": "550e8400e29b41d4a716446655443103",
@@ -73,11 +67,8 @@
             "value_type": "TEXT",
             "delay": "0",
             "master_item": { "key": "essstat.info[{$ESS_IP},{$ESS_USER},{$ESS_PWD}]" },
-            "preprocessing": [
-              { "type": "JSONPATH", "parameters": ["$['data'][0]['{#IPSTR}']"] }
-            ],
-            "inventory_link": "OOB_IP",
-            "tags": [{ "tag": "info", "value": "ipStr" }]
+            "preprocessing": [{ "type": "JSONPATH", "parameters": ["$['data'][0]['{#IPSTR}']"] }],
+            "inventory_link": "OOB_IP"
           },
           {
             "uuid": "550e8400e29b41d4a716446655443104",
@@ -87,11 +78,8 @@
             "value_type": "TEXT",
             "delay": "0",
             "master_item": { "key": "essstat.info[{$ESS_IP},{$ESS_USER},{$ESS_PWD}]" },
-            "preprocessing": [
-              { "type": "JSONPATH", "parameters": ["$['data'][0]['{#NETMASKSTR}']"] }
-            ],
-            "inventory_link": "HOST_NETMASK",
-            "tags": [{ "tag": "info", "value": "netmaskStr" }]
+            "preprocessing": [{ "type": "JSONPATH", "parameters": ["$['data'][0]['{#NETMASKSTR}']"] }],
+            "inventory_link": "HOST_NETMASK"
           },
           {
             "uuid": "550e8400e29b41d4a716446655443105",
@@ -101,11 +89,8 @@
             "value_type": "TEXT",
             "delay": "0",
             "master_item": { "key": "essstat.info[{$ESS_IP},{$ESS_USER},{$ESS_PWD}]" },
-            "preprocessing": [
-              { "type": "JSONPATH", "parameters": ["$['data'][0]['{#GATEWAYSTR}']"] }
-            ],
-            "inventory_link": "HOST_ROUTER",
-            "tags": [{ "tag": "info", "value": "gatewayStr" }]
+            "preprocessing": [{ "type": "JSONPATH", "parameters": ["$['data'][0]['{#GATEWAYSTR}']"] }],
+            "inventory_link": "HOST_ROUTER"
           },
           {
             "uuid": "550e8400e29b41d4a716446655443106",
@@ -115,11 +100,8 @@
             "value_type": "TEXT",
             "delay": "0",
             "master_item": { "key": "essstat.info[{$ESS_IP},{$ESS_USER},{$ESS_PWD}]" },
-            "preprocessing": [
-              { "type": "JSONPATH", "parameters": ["$['data'][0]['{#FIRMWARESTR}']"] }
-            ],
-            "inventory_link": "OS_FULL",
-            "tags": [{ "tag": "info", "value": "firmwareStr" }]
+            "preprocessing": [{ "type": "JSONPATH", "parameters": ["$['data'][0]['{#FIRMWARESTR}']"] }],
+            "inventory_link": "OS_FULL"
           },
           {
             "uuid": "550e8400e29b41d4a716446655443108",
@@ -131,10 +113,9 @@
             "master_item": { "key": "essstat.info[{$ESS_IP},{$ESS_USER},{$ESS_PWD}]" },
             "preprocessing": [
               { "type": "JSONPATH", "parameters": ["$['data'][0]['{#FIRMWARESTR}']"] },
-              { "type": "REGEX",    "parameters": ["^(.*?)\\s+Build", "\\1"] }
+              { "type": "REGEX", "parameters": ["^(.*?)\\s+Build", "\\1"] }
             ],
-            "inventory_link": "OS",
-            "tags": [{ "tag": "info", "value": "firmware.os" }]
+            "inventory_link": "OS"
           },
           {
             "uuid": "550e8400e29b41d4a716446655443109",
@@ -145,15 +126,9 @@
             "delay": "0",
             "master_item": { "key": "essstat.info[{$ESS_IP},{$ESS_USER},{$ESS_PWD}]" },
             "preprocessing": [
-              {
-                "type": "JAVASCRIPT",
-                "parameters": [
-                  "return 'Easy Smart Switch';"
-                ]
-              }
+              { "type": "JAVASCRIPT", "parameters": [ "return 'Easy Smart Switch';" ] }
             ],
-            "inventory_link": "TYPE",
-            "tags": [{ "tag": "info", "value": "type" }]
+            "inventory_link": "TYPE"
           },
           {
             "uuid": "550e8400e29b41d4a716446655443107",
@@ -163,11 +138,8 @@
             "value_type": "TEXT",
             "delay": "0",
             "master_item": { "key": "essstat.info[{$ESS_IP},{$ESS_USER},{$ESS_PWD}]" },
-            "preprocessing": [
-              { "type": "JSONPATH", "parameters": ["$['data'][0]['{#HARDWARESTR}']"] }
-            ],
-            "inventory_link": "MODEL",
-            "tags": [{ "tag": "info", "value": "hardwareStr" }]
+            "preprocessing": [{ "type": "JSONPATH", "parameters": ["$['data'][0]['{#HARDWARESTR}']"] }],
+            "inventory_link": "MODEL"
           }
         ],
         "discovery_rules": [
@@ -177,7 +149,129 @@
             "key": "essstat.discovery[{$ESS_IP},{$ESS_USER},{$ESS_PWD}]",
             "type": "ZABBIX_PASSIVE",
             "delay": "5m",
-            "lifetime": "7d"
+            "lifetime": "7d",
+            "item_prototypes": [
+              {
+                "uuid": "550e8400e29b41d4a716446655441206",
+                "name": "Port {#PORT} State",
+                "key": "essstat.value[{#PORT},state]",
+                "type": "DEPENDENT",
+                "master_item": { "key": "essstat.1line[{$ESS_IP},{$ESS_USER},{$ESS_PWD}]" },
+                "value_type": "UNSIGNED",
+                "delay": "0",
+                "preprocessing": [
+                  { "type": "JAVASCRIPT", "parameters": [
+                    "var p='{#PORT}';\nvar a=(value||'').trim().split(',');\nif(a.length<3) return null;\nfor(var i=2;i+6<a.length;i+=7){ if(a[i]===String(p)) return a[i+1]; }\nreturn null;"
+                  ] }
+                ]
+              },
+              {
+                "uuid": "550e8400e29b41d4a716446655441207",
+                "name": "Port {#PORT} Link Status",
+                "key": "essstat.value[{#PORT},link_status]",
+                "type": "DEPENDENT",
+                "master_item": { "key": "essstat.1line[{$ESS_IP},{$ESS_USER},{$ESS_PWD}]" },
+                "value_type": "UNSIGNED",
+                "delay": "0",
+                "preprocessing": [
+                  { "type": "JAVASCRIPT", "parameters": [
+                    "var p='{#PORT}';\nvar a=(value||'').trim().split(',');\nif(a.length<3) return null;\nfor(var i=2;i+6<a.length;i+=7){ if(a[i]===String(p)) return a[i+2]; }\nreturn null;"
+                  ] }
+                ]
+              },
+              {
+                "uuid": "550e8400e29b41d4a716446655441202",
+                "name": "Port {#PORT} TxGoodPkt",
+                "key": "essstat.value[{#PORT},TxGoodPkt]",
+                "type": "DEPENDENT",
+                "master_item": { "key": "essstat.1line[{$ESS_IP},{$ESS_USER},{$ESS_PWD}]" },
+                "value_type": "FLOAT",
+                "delay": "0",
+                "units": "pps",
+                "preprocessing": [
+                  { "type": "JAVASCRIPT", "parameters": [
+                    "var p='{#PORT}';\nvar a=(value||'').trim().split(',');\nif(a.length<3) return null;\nfor(var i=2;i+6<a.length;i+=7){ if(a[i]===String(p)) return a[i+3]; }\nreturn null;"
+                  ] },
+                  { "type": "CHANGE_PER_SECOND", "parameters": [""] }
+                ]
+              },
+              {
+                "uuid": "550e8400e29b41d4a716446655441203",
+                "name": "Port {#PORT} TxBadPkt",
+                "key": "essstat.value[{#PORT},TxBadPkt]",
+                "type": "DEPENDENT",
+                "master_item": { "key": "essstat.1line[{$ESS_IP},{$ESS_USER},{$ESS_PWD}]" },
+                "value_type": "FLOAT",
+                "delay": "0",
+                "units": "pps",
+                "preprocessing": [
+                  { "type": "JAVASCRIPT", "parameters": [
+                    "var p='{#PORT}';\nvar a=(value||'').trim().split(',');\nif(a.length<3) return null;\nfor(var i=2;i+6<a.length;i+=7){ if(a[i]===String(p)) return a[i+4]; }\nreturn null;"
+                  ] },
+                  { "type": "CHANGE_PER_SECOND", "parameters": [""] }
+                ]
+              },
+              {
+                "uuid": "550e8400e29b41d4a716446655441204",
+                "name": "Port {#PORT} RxGoodPkt",
+                "key": "essstat.value[{#PORT},RxGoodPkt]",
+                "type": "DEPENDENT",
+                "master_item": { "key": "essstat.1line[{$ESS_IP},{$ESS_USER},{$ESS_PWD}]" },
+                "value_type": "FLOAT",
+                "delay": "0",
+                "units": "pps",
+                "preprocessing": [
+                  { "type": "JAVASCRIPT", "parameters": [
+                    "var p='{#PORT}';\nvar a=(value||'').trim().split(',');\nif(a.length<3) return null;\nfor(var i=2;i+6<a.length;i+=7){ if(a[i]===String(p)) return a[i+5]; }\nreturn null;"
+                  ] },
+                  { "type": "CHANGE_PER_SECOND", "parameters": [""] }
+                ]
+              },
+              {
+                "uuid": "550e8400e29b41d4a716446655441205",
+                "name": "Port {#PORT} RxBadPkt",
+                "key": "essstat.value[{#PORT},RxBadPkt]",
+                "type": "DEPENDENT",
+                "master_item": { "key": "essstat.1line[{$ESS_IP},{$ESS_USER},{$ESS_PWD}]" },
+                "value_type": "FLOAT",
+                "delay": "0",
+                "units": "pps",
+                "preprocessing": [
+                  { "type": "JAVASCRIPT", "parameters": [
+                    "var p='{#PORT}';\nvar a=(value||'').trim().split(',');\nif(a.length<3) return null;\nfor(var i=2;i+6<a.length;i+=7){ if(a[i]===String(p)) return a[i+6]; }\nreturn null;"
+                  ] },
+                  { "type": "CHANGE_PER_SECOND", "parameters": [""] }
+                ]
+              }
+            ],
+            "graph_prototypes": [
+              {
+                "uuid": "550e8400e29b41d4a716446655447001",
+                "name": "Port {#PORT} - ESS Packets",
+                "graph_items": [
+                  {
+                    "color": "00AA00",
+                    "calc_fnc": "ALL",
+                    "item": { "host": "TP-Link Easy Smart Switch", "key": "essstat.value[{#PORT},TxGoodPkt]" }
+                  },
+                  {
+                    "color": "0000AA",
+                    "calc_fnc": "ALL",
+                    "item": { "host": "TP-Link Easy Smart Switch", "key": "essstat.value[{#PORT},RxGoodPkt]" }
+                  },
+                  {
+                    "color": "AA0000",
+                    "calc_fnc": "ALL",
+                    "item": { "host": "TP-Link Easy Smart Switch", "key": "essstat.value[{#PORT},TxBadPkt]" }
+                  },
+                  {
+                    "color": "AA00AA",
+                    "calc_fnc": "ALL",
+                    "item": { "host": "TP-Link Easy Smart Switch", "key": "essstat.value[{#PORT},RxBadPkt]" }
+                  }
+                ]
+              }
+            ]
           }
         ]
       }
@@ -187,8 +281,7 @@
         "uuid": "550e8400e29b41d4a716446655449999",
         "expression": "{TP-Link Easy Smart Switch:essstat.1line[{$ESS_IP},{$ESS_USER},{$ESS_PWD}].nodata({$ESS_POLL_FAIL}*{$ESS_1LINE_INTERVAL})}=1",
         "name": "ESS CSV single line polling failed for {$ESS_POLL_FAIL}×{$ESS_1LINE_INTERVAL}",
-        "priority": "WARNING",
-        "tags": [{ "tag": "scope", "value": "availability" }]
+        "priority": "WARNING"
       }
     ]
   }
