@@ -41,22 +41,25 @@ Python&nbsp;3.6 and uses the [Beautiful Soup](https://pypi.org/project/beautiful
 
 ##### positional arguments:
 
-    TPhost                IP address or hostname of switch
+  TPhost                IP address or hostname of switch
 
 ##### optional arguments:
 
-    -h, --help            show this help message and exit
-    -1, --1line           output in a single line
-    -d, --debug           activate debugging output
-    -j, --json            output in JSON format
-    -l, --lld             output in Zabbix Low-Level Discovery JSON format
-    -p TPpswd, --password TPpswd
-                          password for switch access
-    -s, --statsonly       output post statistics only
-    -u TPuser, --username TPuser
-                          username for switch access
-    --port PORT           specific port number to retrieve
-    --metric METRIC       metric name for specific port (state, link_status, TxGoodPkt, TxBadPkt, RxGoodPkt, RxBadPkt)
+  -h, --help            show this help message and exit
+  -1, --1line           output on a single line (CSV)
+  -d, --debug           activate debugging output
+  -i, --info            fetch system info instead of port statistics
+  -j, --json            output as JSON
+  -l, --lld             output in Zabbix LLD JSON format
+  -p TPpswd, --password TPpswd
+                        password for switch access
+  -u TPuser, --username TPuser
+                        username for switch access
+  -s, --statsonly       output per-port statistics only (one line per port)
+  -P PORT, --port PORT  specific port number to retrieve
+  -M METRIC, --metric METRIC
+                        metric name for specific port (state, link_status, TxGoodPkt, TxBadPkt, RxGoodPkt, RxBadPkt)
+  -v, --Version         show program's version number and exit
 
 
 #### Example
@@ -82,8 +85,8 @@ Python&nbsp;3.6 and uses the [Beautiful Soup](https://pypi.org/project/beautiful
 
 Zabbix integration has been developed and tested with Zabbix 7.0 LTS. The approach used is to leverage the Zabbix Agent 2 
 on the Zabbix server to execute the data retrieval from the switch. To support this, `Template_essstat.json` has been created
-to facilitate discovery and automatic creation of monitored items and graphs. Multiple switches may be monitored under separate 
-Zabbix host definitions. 
+to facilitate discovery and automatic creation of monitored items, graphs and inventory field population. Multiple switches 
+may be monitored under separate Zabbix host definitions. 
 
 #### Import template
 Import the JSON file to establish the template definition in Zabbix. In Zabbix 7.0, login with administrative privileges and navigate
@@ -110,12 +113,18 @@ it. Once it is in place, restart the zabbix-agent2 service so that the file will
 1. Link the template  
     - **Templates** → **Select** → choose `Template ESS Switch`  
 
-1. Set host-level macros  
+1. Set required host-level macros  
     - **Macros tab** → **Add:**  
-        - `{$SWITCH_IP}` = _switch management IP_ or _FQDN_ 
+        - `{$ESS_IP}` = _switch management IP_ or _FQDN_ 
           (If you prefer, you can leave `{$SWITCH_IP}` blank and set it to `{HOST.HOST}`, provided the host name is the switch’s resolvable name/IP.)  
-        - `{$SWITCH_USER}` = admin (only need to define this if not the default of `admin`)  
-        - `{$SWITCH_PWD}` = •••••• (the real password)  
+        - `{$ESS_PWD}` = •••••• (the real password)  
+
+1. Set optional host-level macros (only if defaults need override)
+    - **Macros tab** → **Add:**  
+        - `{$ESS_USER}` (default admin) Administrative username for switch management
+        - `{$ESS_1LINE_INTERVAL}`(default 60s) Interval between polls collecting all per-port metrics
+        - `{$ESS_INFO_INTERVAL}` (default 1h) Interval between polls for inventory data
+        - `{$ESS_POLL_FAIL}` (default 3) This many failures in a row for the 1line poll will trigger a warning
 
 1. Save
 

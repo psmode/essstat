@@ -4,6 +4,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.0.0] - 2025-08-22
+
+### Added
+- [Template_essstat.json] Automatic population of Inventory fields.
+- [Template_essstat.json] Trigger warning alarm on successive polling failures.
+- [essstat.conf] UserParameter essstat.info[*] to support retrieval of data for Inventory
+- [essstat.py] --debug to support diagnostic output including full dumps of returned data
+- [essstat.py] --version to show script version 
+- [essstat.py] --info to support return of system information for use with Zabbix Inventory
+
+### Changed
+- [Template_essstat.json] Modified all macros to use names starting with ESS_
+instead of SWITCH_ and added a few more. This gives:
+  - {$ESS_1LINE_INTERVAL} (default 60s) Interval between polls collecting all per-port metrics
+  - {$ESS_INFO_INTERVAL} (default 1h) Interval between polls for inventory data
+  - {$ESS_IP} (default {HOST.HOST}) The IP address or resolvable hostname of the switch
+  - {$ESS_POLL_FAIL} (default 3) This many failures in a row for the 1line poll will trigger a warning
+  - {$ESS_PWD} (default changeme) Password used to access the switch
+  - {$ESS_USER} (default admin) Administrative username for switch management
+- [essstat.py] Short forms of --port and --metric are now -I and -M respectively
+
+
 ## [0.8.1] - 2025-08-21
 
 ### Changed

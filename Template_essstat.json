@@ -8,196 +8,187 @@
         "name": "TP-Link Easy Smart Switch",
         "groups": [{ "name": "Templates" }],
         "macros": [
-          { "macro": "{$SWITCH_USER}", "value": "admin" },
-          { "macro": "{$SWITCH_PWD}",  "value": "changeme" },
-          { "macro": "{$SWITCH_IP}",   "value": "{HOST.HOST}" }
+          { "macro": "{$ESS_USER}", "value": "admin" },
+          { "macro": "{$ESS_PWD}",  "value": "changeme" },
+          { "macro": "{$ESS_IP}",   "value": "{HOST.HOST}" },
+          { "macro": "{$ESS_1LINE_INTERVAL}", "value": "60s" },
+          { "macro": "{$ESS_POLL_FAIL}",      "value": "3" },
+          { "macro": "{$ESS_INFO_INTERVAL}",  "value": "1h" }
         ],
         "items": [
           {
             "uuid": "550e8400e29b41d4a716446655442000",
             "name": "ESS CSV single line",
-            "key": "essstat.1line[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD}]",
+            "key": "essstat.1line[{$ESS_IP},{$ESS_USER},{$ESS_PWD}]",
             "type": "ZABBIX_PASSIVE",
             "value_type": "TEXT",
-            "delay": "1m",
+            "delay": "{$ESS_1LINE_INTERVAL}",
             "history": "1d",
             "description": "One CSV line: ts,port_count,(port,state,link_status,TxGoodPkt,TxBadPkt,RxGoodPkt,RxBadPkt)*"
+          },
+          {
+            "uuid": "550e8400e29b41d4a716446655443100",
+            "name": "ESS switch info (LLD JSON)",
+            "key": "essstat.info[{$ESS_IP},{$ESS_USER},{$ESS_PWD}]",
+            "type": "ZABBIX_PASSIVE",
+            "value_type": "TEXT",
+            "delay": "{$ESS_INFO_INTERVAL}",
+            "history": "7d",
+            "trends": "0",
+            "description": "System info via --info --lld; expects {\"data\":[{\"{#DESCRISTR}\":...,\"{#MACSTR}\":...,\"{#IPSTR}\":...,\"{#NETMASKSTR}\":...,\"{#GATEWAYSTR}\":...,\"{#FIRMWARESTR}\":...,\"{#HARDWARESTR}\":...}]}"
+          },
+          {
+            "uuid": "550e8400e29b41d4a716446655443101",
+            "name": "Switch description",
+            "key": "essstat.info.value[descriStr]",
+            "type": "DEPENDENT",
+            "value_type": "TEXT",
+            "delay": "0",
+            "master_item": { "key": "essstat.info[{$ESS_IP},{$ESS_USER},{$ESS_PWD}]" },
+            "preprocessing": [
+              { "type": "JSONPATH", "parameters": ["$['data'][0]['{#DESCRISTR}']"] }
+            ],
+            "inventory_link": "NAME",
+            "tags": [{ "tag": "info", "value": "descriStr" }]
+          },
+          {
+            "uuid": "550e8400e29b41d4a716446655443102",
+            "name": "Switch MAC address",
+            "key": "essstat.info.value[macStr]",
+            "type": "DEPENDENT",
+            "value_type": "TEXT",
+            "delay": "0",
+            "master_item": { "key": "essstat.info[{$ESS_IP},{$ESS_USER},{$ESS_PWD}]" },
+            "preprocessing": [
+              { "type": "JSONPATH", "parameters": ["$['data'][0]['{#MACSTR}']"] }
+            ],
+            "inventory_link": "MACADDRESS_A",
+            "tags": [{ "tag": "info", "value": "macStr" }]
+          },
+          {
+            "uuid": "550e8400e29b41d4a716446655443103",
+            "name": "Switch IP",
+            "key": "essstat.info.value[ipStr]",
+            "type": "DEPENDENT",
+            "value_type": "TEXT",
+            "delay": "0",
+            "master_item": { "key": "essstat.info[{$ESS_IP},{$ESS_USER},{$ESS_PWD}]" },
+            "preprocessing": [
+              { "type": "JSONPATH", "parameters": ["$['data'][0]['{#IPSTR}']"] }
+            ],
+            "inventory_link": "OOB_IP",
+            "tags": [{ "tag": "info", "value": "ipStr" }]
+          },
+          {
+            "uuid": "550e8400e29b41d4a716446655443104",
+            "name": "Switch netmask",
+            "key": "essstat.info.value[netmaskStr]",
+            "type": "DEPENDENT",
+            "value_type": "TEXT",
+            "delay": "0",
+            "master_item": { "key": "essstat.info[{$ESS_IP},{$ESS_USER},{$ESS_PWD}]" },
+            "preprocessing": [
+              { "type": "JSONPATH", "parameters": ["$['data'][0]['{#NETMASKSTR}']"] }
+            ],
+            "inventory_link": "HOST_NETMASK",
+            "tags": [{ "tag": "info", "value": "netmaskStr" }]
+          },
+          {
+            "uuid": "550e8400e29b41d4a716446655443105",
+            "name": "Switch gateway",
+            "key": "essstat.info.value[gatewayStr]",
+            "type": "DEPENDENT",
+            "value_type": "TEXT",
+            "delay": "0",
+            "master_item": { "key": "essstat.info[{$ESS_IP},{$ESS_USER},{$ESS_PWD}]" },
+            "preprocessing": [
+              { "type": "JSONPATH", "parameters": ["$['data'][0]['{#GATEWAYSTR}']"] }
+            ],
+            "inventory_link": "HOST_ROUTER",
+            "tags": [{ "tag": "info", "value": "gatewayStr" }]
+          },
+          {
+            "uuid": "550e8400e29b41d4a716446655443106",
+            "name": "Switch firmware",
+            "key": "essstat.info.value[firmwareStr]",
+            "type": "DEPENDENT",
+            "value_type": "TEXT",
+            "delay": "0",
+            "master_item": { "key": "essstat.info[{$ESS_IP},{$ESS_USER},{$ESS_PWD}]" },
+            "preprocessing": [
+              { "type": "JSONPATH", "parameters": ["$['data'][0]['{#FIRMWARESTR}']"] }
+            ],
+            "inventory_link": "OS_FULL",
+            "tags": [{ "tag": "info", "value": "firmwareStr" }]
+          },
+          {
+            "uuid": "550e8400e29b41d4a716446655443108",
+            "name": "Switch OS (from firmware)",
+            "key": "essstat.info.value[firmwareStr.os]",
+            "type": "DEPENDENT",
+            "value_type": "TEXT",
+            "delay": "0",
+            "master_item": { "key": "essstat.info[{$ESS_IP},{$ESS_USER},{$ESS_PWD}]" },
+            "preprocessing": [
+              { "type": "JSONPATH", "parameters": ["$['data'][0]['{#FIRMWARESTR}']"] },
+              { "type": "REGEX",    "parameters": ["^(.*?)\\s+Build", "\\1"] }
+            ],
+            "inventory_link": "OS",
+            "tags": [{ "tag": "info", "value": "firmware.os" }]
+          },
+          {
+            "uuid": "550e8400e29b41d4a716446655443109",
+            "name": "Switch Type",
+            "key": "essstat.info.value[type]",
+            "type": "DEPENDENT",
+            "value_type": "TEXT",
+            "delay": "0",
+            "master_item": { "key": "essstat.info[{$ESS_IP},{$ESS_USER},{$ESS_PWD}]" },
+            "preprocessing": [
+              {
+                "type": "JAVASCRIPT",
+                "parameters": [
+                  "return 'Easy Smart Switch';"
+                ]
+              }
+            ],
+            "inventory_link": "TYPE",
+            "tags": [{ "tag": "info", "value": "type" }]
+          },
+          {
+            "uuid": "550e8400e29b41d4a716446655443107",
+            "name": "Switch hardware",
+            "key": "essstat.info.value[hardwareStr]",
+            "type": "DEPENDENT",
+            "value_type": "TEXT",
+            "delay": "0",
+            "master_item": { "key": "essstat.info[{$ESS_IP},{$ESS_USER},{$ESS_PWD}]" },
+            "preprocessing": [
+              { "type": "JSONPATH", "parameters": ["$['data'][0]['{#HARDWARESTR}']"] }
+            ],
+            "inventory_link": "MODEL",
+            "tags": [{ "tag": "info", "value": "hardwareStr" }]
           }
         ],
         "discovery_rules": [
           {
             "uuid": "550e8400e29b41d4a716446655441001",
             "name": "ESS Port Discovery",
-            "key": "essstat.discovery[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD}]",
+            "key": "essstat.discovery[{$ESS_IP},{$ESS_USER},{$ESS_PWD}]",
             "type": "ZABBIX_PASSIVE",
             "delay": "5m",
-            "lifetime": "7d",
-            "item_prototypes": [
-              {
-                "uuid": "550e8400e29b41d4a716446655441206",
-                "name": "Port {#PORT} State",
-                "key": "essstat.value[{#PORT},state]",
-                "type": "DEPENDENT",
-                "master_item": { "key": "essstat.1line[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD}]" },
-                "value_type": "UNSIGNED",
-                "delay": "0",
-                "preprocessing": [
-                  {
-                    "type": "JAVASCRIPT",
-                    "parameters": [
-                      "var p='{#PORT}';\nvar a=value.trim().split(',');\nif(a.length<3) return null;\nfor(var i=2;i+6<a.length;i+=7){ if(a[i]===String(p)) return a[i+1]; }\nreturn null;"
-                    ]
-                  }
-                ],
-                "tags": [
-                  { "tag": "metric", "value": "State" },
-                  { "tag": "port",   "value": "{#PORT}" }
-                ]
-              },
-              {
-                "uuid": "550e8400e29b41d4a716446655441207",
-                "name": "Port {#PORT} Link Status",
-                "key": "essstat.value[{#PORT},link_status]",
-                "type": "DEPENDENT",
-                "master_item": { "key": "essstat.1line[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD}]" },
-                "value_type": "UNSIGNED",
-                "delay": "0",
-                "preprocessing": [
-                  {
-                    "type": "JAVASCRIPT",
-                    "parameters": [
-                      "var p='{#PORT}';\nvar a=value.trim().split(',');\nif(a.length<3) return null;\nfor(var i=2;i+6<a.length;i+=7){ if(a[i]===String(p)) return a[i+2]; }\nreturn null;"
-                    ]
-                  }
-                ],
-                "tags": [
-                  { "tag": "metric", "value": "LinkStatus" },
-                  { "tag": "port",   "value": "{#PORT}" }
-                ]
-              },
-              {
-                "uuid": "550e8400e29b41d4a716446655441202",
-                "name": "Port {#PORT} TxGoodPkt",
-                "key": "essstat.value[{#PORT},TxGoodPkt]",
-                "type": "DEPENDENT",
-                "master_item": { "key": "essstat.1line[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD}]" },
-                "value_type": "FLOAT",
-                "delay": "0",
-                "units": "pps",
-                "preprocessing": [
-                  {
-                    "type": "JAVASCRIPT",
-                    "parameters": [
-                      "var p='{#PORT}';\nvar a=value.trim().split(',');\nif(a.length<3) return null;\nfor(var i=2;i+6<a.length;i+=7){ if(a[i]===String(p)) return a[i+3]; }\nreturn null;"
-                    ]
-                  },
-                  { "type": "CHANGE_PER_SECOND", "parameters": [""] }
-                ],
-                "tags": [
-                  { "tag": "metric", "value": "TxGoodPkt" },
-                  { "tag": "port",   "value": "{#PORT}" }
-                ]
-              },
-              {
-                "uuid": "550e8400e29b41d4a716446655441203",
-                "name": "Port {#PORT} TxBadPkt",
-                "key": "essstat.value[{#PORT},TxBadPkt]",
-                "type": "DEPENDENT",
-                "master_item": { "key": "essstat.1line[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD}]" },
-                "value_type": "FLOAT",
-                "delay": "0",
-                "units": "pps",
-                "preprocessing": [
-                  {
-                    "type": "JAVASCRIPT",
-                    "parameters": [
-                      "var p='{#PORT}';\nvar a=value.trim().split(',');\nif(a.length<3) return null;\nfor(var i=2;i+6<a.length;i+=7){ if(a[i]===String(p)) return a[i+4]; }\nreturn null;"
-                    ]
-                  },
-                  { "type": "CHANGE_PER_SECOND", "parameters": [""] }
-                ],
-                "tags": [
-                  { "tag": "metric", "value": "TxBadPkt" },
-                  { "tag": "port",   "value": "{#PORT}" }
-                ]
-              },
-              {
-                "uuid": "550e8400e29b41d4a716446655441204",
-                "name": "Port {#PORT} RxGoodPkt",
-                "key": "essstat.value[{#PORT},RxGoodPkt]",
-                "type": "DEPENDENT",
-                "master_item": { "key": "essstat.1line[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD}]" },
-                "value_type": "FLOAT",
-                "delay": "0",
-                "units": "pps",
-                "preprocessing": [
-                  {
-                    "type": "JAVASCRIPT",
-                    "parameters": [
-                      "var p='{#PORT}';\nvar a=value.trim().split(',');\nif(a.length<3) return null;\nfor(var i=2;i+6<a.length;i+=7){ if(a[i]===String(p)) return a[i+5]; }\nreturn null;"
-                    ]
-                  },
-                  { "type": "CHANGE_PER_SECOND", "parameters": [""] }
-                ],
-                "tags": [
-                  { "tag": "metric", "value": "RxGoodPkt" },
-                  { "tag": "port",   "value": "{#PORT}" }
-                ]
-              },
-              {
-                "uuid": "550e8400e29b41d4a716446655441205",
-                "name": "Port {#PORT} RxBadPkt",
-                "key": "essstat.value[{#PORT},RxBadPkt]",
-                "type": "DEPENDENT",
-                "master_item": { "key": "essstat.1line[{$SWITCH_IP},{$SWITCH_USER},{$SWITCH_PWD}]" },
-                "value_type": "FLOAT",
-                "delay": "0",
-                "units": "pps",
-                "preprocessing": [
-                  {
-                    "type": "JAVASCRIPT",
-                    "parameters": [
-                      "var p='{#PORT}';\nvar a=value.trim().split(',');\nif(a.length<3) return null;\nfor(var i=2;i+6<a.length;i+=7){ if(a[i]===String(p)) return a[i+6]; }\nreturn null;"
-                    ]
-                  },
-                  { "type": "CHANGE_PER_SECOND", "parameters": [""] }
-                ],
-                "tags": [
-                  { "tag": "metric", "value": "RxBadPkt" },
-                  { "tag": "port",   "value": "{#PORT}" }
-                ]
-              }
-            ],
-            "graph_prototypes": [
-              {
-                "uuid": "550e8400e29b41d4a716446655447001",
-                "name": "Port {#PORT} - ESS Packets",
-                "graph_items": [
-                  {
-                    "color": "00AA00",
-                    "calc_fnc": "ALL",
-                    "item": { "host": "TP-Link Easy Smart Switch", "key": "essstat.value[{#PORT},TxGoodPkt]" }
-                  },
-                  {
-                    "color": "0000AA",
-                    "calc_fnc": "ALL",
-                    "item": { "host": "TP-Link Easy Smart Switch", "key": "essstat.value[{#PORT},RxGoodPkt]" }
-                  },
-                  {
-                    "color": "AA0000",
-                    "calc_fnc": "ALL",
-                    "item": { "host": "TP-Link Easy Smart Switch", "key": "essstat.value[{#PORT},TxBadPkt]" }
-                  },
-                  {
-                    "color": "AA00AA",
-                    "calc_fnc": "ALL",
-                    "item": { "host": "TP-Link Easy Smart Switch", "key": "essstat.value[{#PORT},RxBadPkt]" }
-                  }
-                ]
-              }
-            ]
+            "lifetime": "7d"
           }
         ]
+      }
+    ],
+    "triggers": [
+      {
+        "uuid": "550e8400e29b41d4a716446655449999",
+        "expression": "{TP-Link Easy Smart Switch:essstat.1line[{$ESS_IP},{$ESS_USER},{$ESS_PWD}].nodata({$ESS_POLL_FAIL}*{$ESS_1LINE_INTERVAL})}=1",
+        "name": "ESS CSV single line polling failed for {$ESS_POLL_FAIL}×{$ESS_1LINE_INTERVAL}",
+        "priority": "WARNING",
+        "tags": [{ "tag": "scope", "value": "availability" }]
       }
     ]
   }
