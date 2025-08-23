@@ -124,7 +124,7 @@ it. Once it is in place, restart the zabbix-agent2 service so that the file will
         - `{$ESS_USER}` (default admin) Administrative username for switch management
         - `{$ESS_1LINE_INTERVAL}`(default 60s) Interval between polls collecting all per-port metrics
         - `{$ESS_INFO_INTERVAL}` (default 1h) Interval between polls for inventory data
-        - `{$ESS_POLL_FAIL}` (default 3) This many failures in a row for the 1line poll will trigger a warning
+        - `{$ESS_POLL_FAIL_INTERVAL}` (default 180s) Consistent failures over this time interval for the 1line poll will trigger a warning
 
 1. Save
 

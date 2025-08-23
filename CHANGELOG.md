@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.1.0] - 2025-08-23
+
+### Changed
+- [Template_essstat.json] Replaced {$ESS_POLL_FAIL} as a counter based quantity with 
+{$ESS_POLL_FAIL_INTERVAL} a time based quantity with default 180s.
+- [Template_essstat.json] To better normalize and tidy template code, the template is
+now imported, then exported to ensure consistent formatting and make tracking deltas
+easier.
+
+### Fixed
+- [Template_essstat.json] Corrected error in number of ports handling not based on 
+parameter from data return.
+- [Template_essstat.json] Fixed trigger logic to alert on repeated polling failures.
+Trigger is drive by the time based macro {$ESS_POLL_FAIL_INTERVAL}
+
+
 ## [1.0.0] - 2025-08-22
 
 ### Added
