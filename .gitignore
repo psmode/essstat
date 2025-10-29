@@ -1,2 +1,5 @@
 *.bak
 env
+venv
+.venv
+*.pyc
