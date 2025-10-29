@@ -40,9 +40,9 @@ Python&nbsp;3.6 and uses the [Beautiful Soup](https://pypi.org/project/beautiful
 #### Options
 
 ##### positional arguments:
-
+```
   TPhost                IP address or hostname of switch
-
+```
 ##### optional arguments:
 ```
   -h, --help            show this help message and exit
