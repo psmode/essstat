@@ -44,7 +44,7 @@ Python&nbsp;3.6 and uses the [Beautiful Soup](https://pypi.org/project/beautiful
   TPhost                IP address or hostname of switch
 
 ##### optional arguments:
-
+```
   -h, --help            show this help message and exit
   -1, --1line           output on a single line (CSV)
   -d, --debug           activate debugging output
@@ -60,7 +60,7 @@ Python&nbsp;3.6 and uses the [Beautiful Soup](https://pypi.org/project/beautiful
   -M METRIC, --metric METRIC
                         metric name for specific port (state, link_status, TxGoodPkt, TxBadPkt, RxGoodPkt, RxBadPkt)
   -v, --Version         show program's version number and exit
-
+```
 
 #### Example
 
