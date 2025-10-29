@@ -130,6 +130,7 @@ it. Once it is in place, restart the zabbix-agent2 service so that the file will
 
 It may take a few minutes for the LLD to fire and the items and graphs to be created. Multiple switches my be monitored by 
 creating multiple hosts in Zabbix. Just be sure to set the Macros for each host correctly. 
+![Sample Zabbix chart](./ESS%20Packets%20Zabbix%20Chart.png)
 
 ### Accumulate Data in CSV
 
