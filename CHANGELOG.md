@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.1.1] - 2025-10-30
+
+### Added
+- [README.md] Sample port chart from Zabbix.
+- [.gitignoire] Added exclusions for virtual environment and compiled Python bytcode files. 
+
+### Fixed
+- [README.md] Corrected formatting in README for optional and positional arguments.
+
 ## [1.1.0] - 2025-08-23
 
 ### Changed
