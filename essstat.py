@@ -2,10 +2,10 @@
 # coding: utf-8
 
 __author__ = "Peter Smode"
-__copyright__ = "Copyright 2020, Peter Smode"
+__copyright__ = "Copyright 2025, Peter Smode"
 __credits__ = "Peter Smode"
 __license__ = "GPL 3.0"
-__version__ = "1.0.0"
+__version__ = "1.2.0"
 __maintainer__ = "Peter Smode"
 __email__ = "psmode@kitsnet.us"
 __status__ = "RC"
@@ -241,14 +241,57 @@ if str(r) != "<Response [200]>":
     sys.exit("ERROR: Login failure - bad credential?")
 
 soup = BeautifulSoup(r.text, 'html.parser')
+if TPLdebug:
+    from bs4 import __version__ as bs4__version__
+    print("BeautifulSoup4 version: " + bs4__version__)
+    print(r)
+
+convoluted = (soup.script == soup.head.script)     #TL-SG1016DE and TL-SG108E models have a script before the HEAD block
+if TPLdebug:
+    pprint.pprint(convoluted)
+    if convoluted:
+        # This is the 24 port TL-SG1024DE model with the stats in a different place (and convoluted coding)
+        pprint.pprint(soup.head.find_all("script"))
+        pprint.pprint(soup.body.script)
+    else:
+        # This should be a TL-SG1016DE or a TL-SG108E
+        pprint.pprint(soup.script)    
+
+if TPLdebug:
+    if convoluted:
+        print(pattern.search(str(soup.head.find_all("script"))).group(0))
+        print(pattern.search(str(soup.head.find_all("script"))).group(1))
+        print(pattern.search(str(soup.head.find_all("script"))).group(2))
+    else:
+        print(pattern.search(str(soup.script)).group(0))
+        print(pattern.search(str(soup.script)).group(1))
+        print(pattern.search(str(soup.script)).group(2))
 
 # Extract max port number
 pattern = re.compile(r"var (max_port_num) = (.*?);$", re.MULTILINE)
-max_port_num = int(pattern.search(soup.script.text).group(2))
+if convoluted:
+    max_port_num = int(pattern.search(str(soup.head.find_all("script"))).group(2))
+else:
+    max_port_num = int(pattern.search(str(soup.script)).group(2))
 
 # Extract all port information
-pattern2 = re.compile(r"var all_info = {\n?(.*?)\n?};$", re.MULTILINE | re.DOTALL)
-entries = re.split(",?\n+", pattern2.search(soup.script.text).group(1))
+#pattern2 = re.compile(r"var all_info = {\n?(.*?)\n?};$", re.MULTILINE | re.DOTALL)
+if convoluted:
+    i1 = re.compile(r'tmp_info = "(.*?)";$', re.MULTILINE | re.DOTALL).search(str(soup.body.script)).group(1)
+    i2 = re.compile(r'tmp_info2 = "(.*?)";$', re.MULTILINE | re.DOTALL).search(str(soup.body.script)).group(1)
+    # We simulate bug for bug the way the variables are loaded on the "normal" switch models. In those, each
+    # data array has two extra 0 cells at the end. To remain compatible with the balance of the code here,
+    # we need to add in these redundant entries so they can be removed later. (smh)
+    script_vars = ('tmp_info:[' + i1.rstrip() + ' ' + i2.rstrip() + ',0,0]').replace(" ", ",")
+else:
+    script_vars = re.compile(r"var all_info = {\n?(.*?)\n?};$", re.MULTILINE | re.DOTALL).search(str(soup.script)).group(1)
+if TPLdebug:
+    print(script_vars)
+
+#entries = re.split(",?\n+", pattern2.search(soup.script.text).group(1))
+entries = re.split(",?\n+", script_vars)
+if TPLdebug:
+    pprint.pprint(entries)
 
 edict = {}
 drop2 = re.compile(r"\[(.*),0,0]")  # drop trailing zeros
@@ -257,9 +300,25 @@ for entry in entries:
     edict[str(e2[0])] = drop2.search(e2[1]).group(1)
 
 # Raw arrays
-e3 = re.split(",", edict['state'])
-e4 = re.split(",", edict['link_status'])
-e5 = re.split(",", edict['pkts'])
+#e3 = re.split(",", edict['state'])
+#e4 = re.split(",", edict['link_status'])
+#e5 = re.split(",", edict['pkts'])
+if convoluted:
+    e3 = {}
+    e4 = {}
+    e5 = {}
+    ee = re.split(",", edict['tmp_info'])
+    for x in range (0, max_port_num):
+        e3[x] = ee[(x*6)]
+        e4[x] = ee[(x*6)+1]
+        e5[(x*4)] = ee[(x*6)+2]
+        e5[(x*4)+1] = ee[(x*6)+3]
+        e5[(x*4)+2] = ee[(x*6)+4]
+        e5[(x*4)+3] = ee[(x*6)+5]
+else:
+    e3 = re.split(",", edict['state'])
+    e4 = re.split(",", edict['link_status'])
+    e5 = re.split(",", edict['pkts'])
 
 # Build per-port dict
 pdict = {}
