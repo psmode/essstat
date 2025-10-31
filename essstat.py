@@ -257,6 +257,8 @@ if TPLdebug:
         # This should be a TL-SG1016DE or a TL-SG108E
         pprint.pprint(soup.script)    
 
+# Extract max port number
+pattern = re.compile(r"var (max_port_num) = (.*?);$", re.MULTILINE)
 if TPLdebug:
     if convoluted:
         print(pattern.search(str(soup.head.find_all("script"))).group(0))
@@ -266,9 +268,6 @@ if TPLdebug:
         print(pattern.search(str(soup.script)).group(0))
         print(pattern.search(str(soup.script)).group(1))
         print(pattern.search(str(soup.script)).group(2))
-
-# Extract max port number
-pattern = re.compile(r"var (max_port_num) = (.*?);$", re.MULTILINE)
 if convoluted:
     max_port_num = int(pattern.search(str(soup.head.find_all("script"))).group(2))
 else:
