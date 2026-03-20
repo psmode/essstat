@@ -4,7 +4,7 @@
 They are managed through a web based interface, giving access a number of functions, including basic packets counters per-port. 
 Unfortunately, these switches do not implement SNMP for access to these counters, nor do they appear to implement a discrete URL for
 direct access to this information. This project addresses this issue to produce per-port statistics from a single command line invocation 
-with output that can be trivially parsed for formatted output, or entered into a monitoring system like Zabbix.
+with output that can be trivially parsed for formatted output, or entered into a monitoring system like Zabbix or Prometheus.
 
 This project has been tested against TP-Link switch models TL-SG1016DE, TL-SG108E and TL-SG108PE. It should also be compatible with the other 
 members of this family, including the TL-SG105E and TL-SG1024DE.
@@ -35,7 +35,7 @@ Python&nbsp;3.6 and uses the [Beautiful Soup](https://pypi.org/project/beautiful
 
 #### Usage
 
-    essstat.py [-h] [-1] [-d] [-j] [-l] -p TPpswd [-u TPuser] [-s] [--port PORT] [--metric METRIC] TPhost
+    essstat.py [-h] [-1] [-d] [-j] [-l] [-P] -p TPpswd [-u TPuser] [-s] [-n PORT] [-M METRIC] TPhost
     
 #### Options
 
@@ -51,16 +51,20 @@ Python&nbsp;3.6 and uses the [Beautiful Soup](https://pypi.org/project/beautiful
   -i, --info            fetch system info instead of port statistics
   -j, --json            output as JSON
   -l, --lld             output in Zabbix LLD JSON format
+  -P, --prometheus      output in Prometheus text exposition format (for /metrics scraping)
   -p TPpswd, --password TPpswd
                         password for switch access
   -u TPuser, --username TPuser
                         username for switch access
   -s, --statsonly       output per-port statistics only (one line per port)
-  -P PORT, --port PORT  specific port number to retrieve
+  -n PORT, --port PORT  specific port number to retrieve
   -M METRIC, --metric METRIC
                         metric name for specific port (state, link_status, TxGoodPkt, TxBadPkt, RxGoodPkt, RxBadPkt)
   -v, --Version         show program's version number and exit
 ```
+
+> **Note:** the short flag for `--port` was previously `-P`. It has been renamed to `-n` to free `-P` for `--prometheus`.
+> If you have scripts or Zabbix `UserParameter` entries using `-P <number>`, update them to `-n <number>`.
 
 #### Example
 
@@ -76,10 +80,85 @@ Python&nbsp;3.6 and uses the [Beautiful Soup](https://pypi.org/project/beautiful
     7;Enabled;1000M Full;2903398648,0,4293632425,5
     8;Enabled;Link Down;0,0,0,0
 
-#### Docker Example
+#### Docker
+
+The image supports two modes of operation controlled by environment variables.
+
+##### Build
 
     $ docker build -t essstat .
+
+##### CLI mode (default — original behaviour)
+
+Pass any `essstat.py` arguments directly after the image name, exactly as on the command line:
+
     $ docker run --rm essstat myswitch -p ChangeMe
+    $ docker run --rm essstat myswitch -p ChangeMe -j
+    $ docker run --rm essstat myswitch -p ChangeMe -P    # one-shot Prometheus dump to stdout
+
+##### Exporter mode — long-running Prometheus HTTP endpoint
+
+Set `EXPORTER=1` to start a persistent `/metrics` HTTP server instead of running a one-shot scrape.
+Credentials and connection details are passed via environment variables:
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `EXPORTER` | yes | — | Set to `1` to enable exporter mode |
+| `ESS_HOST` | yes | — | Switch IP address or hostname |
+| `ESS_PASSWORD` | yes | — | Switch admin password |
+| `ESS_USERNAME` | no | `admin` | Switch admin username |
+| `ESS_LISTEN` | no | `0.0.0.0:9101` | Address and port to listen on |
+
+    $ docker run -d \
+        -e EXPORTER=1 \
+        -e ESS_HOST=myswitch \
+        -e ESS_PASSWORD=secret \
+        -p 9101:9101 \
+        essstat
+
+Prometheus then scrapes `http://host:9101/metrics`. Add to `prometheus.yml`:
+
+    scrape_configs:
+      - job_name: tplink_switch
+        static_configs:
+          - targets: ['localhost:9101']
+
+##### Multiple switches with Docker Compose
+
+Run one container per switch, each on its own port:
+
+```yaml
+services:
+  essstat-sw1:
+    image: essstat
+    environment:
+      EXPORTER: "1"
+      ESS_HOST: 192.168.1.10
+      ESS_PASSWORD: secret1
+    ports:
+      - "9101:9101"
+    restart: unless-stopped
+
+  essstat-sw2:
+    image: essstat
+    environment:
+      EXPORTER: "1"
+      ESS_HOST: 192.168.1.11
+      ESS_PASSWORD: secret2
+      ESS_LISTEN: 0.0.0.0:9102
+    ports:
+      - "9102:9102"
+    restart: unless-stopped
+```
+
+Then in `prometheus.yml`:
+
+    scrape_configs:
+      - job_name: tplink_switches
+        static_configs:
+          - targets:
+              - 'localhost:9101'
+              - 'localhost:9102'
 
 ### Zabbix Integration
 
@@ -102,11 +181,11 @@ it. Once it is in place, restart the zabbix-agent2 service so that the file will
 1. Add host  
     - **Configuration** → **Hosts** → **Create host**  
         - Host name: use the switch name or IP (your choice)  
-        - Groups: pick an appropriate host group (e.g., “Network/Switches”)  
+        - Groups: pick an appropriate host group (e.g., "Network/Switches")  
 
 1. Interface (important)  
-    - Add a Zabbix agent interface that points to the Zabbix server’s agent, not the switch:  
-        - DNS/IP: 127.0.0.1 (or the Zabbix server’s IP)  
+    - Add a Zabbix agent interface that points to the Zabbix server's agent, not the switch:  
+        - DNS/IP: 127.0.0.1 (or the Zabbix server's IP)  
         - Port: 10050  
     - Rationale: the server polls its own agent, which runs your script and reaches the switch using the key parameters.  
 
@@ -116,7 +195,7 @@ it. Once it is in place, restart the zabbix-agent2 service so that the file will
 1. Set required host-level macros  
     - **Macros tab** → **Add:**  
         - `{$ESS_IP}` = _switch management IP_ or _FQDN_ 
-          (If you prefer, you can leave `{$SWITCH_IP}` blank and set it to `{HOST.HOST}`, provided the host name is the switch’s resolvable name/IP.)  
+          (If you prefer, you can leave `{$SWITCH_IP}` blank and set it to `{HOST.HOST}`, provided the host name is the switch's resolvable name/IP.)  
         - `{$ESS_PWD}` = •••••• (the real password)  
 
 1. Set optional host-level macros (only if defaults need override)
@@ -131,6 +210,117 @@ it. Once it is in place, restart the zabbix-agent2 service so that the file will
 It may take a few minutes for the LLD to fire and the items and graphs to be created. Multiple switches my be monitored by 
 creating multiple hosts in Zabbix. Just be sure to set the Macros for each host correctly. 
 ![Sample Zabbix chart](./ESS%20Packets%20Zabbix%20Chart.png)
+
+
+### Prometheus Integration
+
+The `-P` / `--prometheus` flag outputs metrics in [Prometheus text exposition format](https://prometheus.io/docs/instrumenting/exposition_formats/),
+suitable for scraping with Prometheus. No additional libraries are required beyond those already used by `essstat.py`.
+
+#### Exported metrics
+
+| Metric | Type | Description |
+|--------|------|-------------|
+| `tplink_port_state` | gauge | Port administrative state: `1` = Enabled, `0` = Disabled |
+| `tplink_port_link_speed_mbps` | gauge | Negotiated link speed in Mbps; `0` = link down or autoneg pending |
+| `tplink_port_txgoodpkt_total` | gauge | Cumulative TX good packets (32-bit hardware counter) |
+| `tplink_port_txbadpkt_total` | gauge | Cumulative TX bad/error packets (32-bit hardware counter) |
+| `tplink_port_rxgoodpkt_total` | gauge | Cumulative RX good packets (32-bit hardware counter) |
+| `tplink_port_rxbadpkt_total` | gauge | Cumulative RX bad/error packets (32-bit hardware counter) |
+
+All metrics carry a `host` label set to the switch hostname/IP passed on the command line, and a `port` label with the port number.
+`tplink_port_link_speed_mbps` also carries a `link_status` label with the raw status string (e.g. `"1000M Full"`).
+
+> **Why `gauge` instead of `counter` for packet metrics?**  
+> The switch hardware counters are 32-bit and wrap at 2³² (~4 billion packets). They also reset to zero on switch reboot.
+> Prometheus `counter` type must be strictly monotonic — a wrap or reboot would appear to Prometheus as a massive negative
+> delta and corrupt `rate()` calculations. Using `gauge` with `delta()` or `increase()` in Grafana queries is safer and
+> more accurate for these counters.
+
+#### Example output
+
+    $ essstat.py myswitch -p ChangeMe -P
+    # HELP tplink_port_state Port administrative state (1=Enabled, 0=Disabled)
+    # TYPE tplink_port_state gauge
+    tplink_port_state{host="myswitch",port="1"} 1 1711929600000
+    tplink_port_state{host="myswitch",port="2"} 1 1711929600000
+    ...
+    
+    # HELP tplink_port_link_speed_mbps Negotiated link speed in Mbps (0 = link down / autoneg pending)
+    # TYPE tplink_port_link_speed_mbps gauge
+    tplink_port_link_speed_mbps{host="myswitch",port="1",link_status="Link Down"} 0 1711929600000
+    tplink_port_link_speed_mbps{host="myswitch",port="2",link_status="1000M Full"} 1000 1711929600000
+    ...
+    
+    # HELP tplink_port_txgoodpkt_total Cumulative TX good packets (32-bit hardware counter, resets on reboot)
+    # TYPE tplink_port_txgoodpkt_total gauge
+    tplink_port_txgoodpkt_total{host="myswitch",port="2"} 3568644976 1711929600000
+    ...
+
+#### Option 1: node_exporter textfile collector (simplest)
+
+The easiest way to get metrics into Prometheus is via the
+[textfile collector](https://github.com/prometheus/node_exporter#textfile-collector) included in `node_exporter`.
+Write the output to a `.prom` file in the collector directory and let `node_exporter` serve it on its `/metrics` endpoint.
+
+Create `/etc/cron.d/essstat-prom` with one entry per switch:
+
+    */1 * * * *  root  /usr/local/bin/essstat.py myswitch -p ChangeMe -P \
+                       > /var/lib/node_exporter/textfile_collector/tplink_myswitch.prom.tmp \
+                 && mv /var/lib/node_exporter/textfile_collector/tplink_myswitch.prom.tmp \
+                       /var/lib/node_exporter/textfile_collector/tplink_myswitch.prom
+
+The atomic `tmp` → final rename prevents Prometheus from scraping a partially written file.
+
+Then add a scrape job to `prometheus.yml` if `node_exporter` is not already scraped:
+
+    scrape_configs:
+      - job_name: node
+        static_configs:
+          - targets: ['localhost:9100']
+
+#### Option 2: standalone HTTP exporter
+
+`essstat_exporter.py` wraps `essstat.py` in a minimal HTTP server so Prometheus can scrape it directly via pull,
+without needing `node_exporter` or a cron job.
+
+    $ python3 essstat_exporter.py --host myswitch --password ChangeMe
+    Listening on http://0.0.0.0:9101/metrics  (switch: myswitch)
+
+Add to `prometheus.yml`:
+
+    scrape_configs:
+      - job_name: tplink_switch
+        static_configs:
+          - targets: ['localhost:9101']
+
+Run one exporter instance per switch, using different `--listen` ports:
+
+    $ python3 essstat_exporter.py --host switch-a --password secretA --listen 0.0.0.0:9101
+    $ python3 essstat_exporter.py --host switch-b --password secretB --listen 0.0.0.0:9102
+
+#### Grafana queries
+
+Once data is flowing into Prometheus, some useful PromQL expressions:
+
+```promql
+# TX throughput (packets/sec) per port
+# delta() is correct here because these are gauge metrics (not counters)
+delta(tplink_port_txgoodpkt_total{host="myswitch"}[1m]) / 60
+
+# RX throughput (packets/sec) per port
+delta(tplink_port_rxgoodpkt_total{host="myswitch"}[1m]) / 60
+
+# Ports currently up
+tplink_port_link_speed_mbps{host="myswitch"} > 0
+
+# Any ports with TX errors in the last 5 minutes
+delta(tplink_port_txbadpkt_total{host="myswitch"}[5m]) > 0
+
+# Any ports with RX errors in the last 5 minutes
+delta(tplink_port_rxbadpkt_total{host="myswitch"}[5m]) > 0
+```
+
 
 ### Accumulate Data in CSV
 
@@ -163,7 +353,7 @@ This macro-enabled Excel workbook is a way to read and chart the port statistics
 
 When using the workbook, the name of the switch and the reporting from and to date/times are specified in the parameter table at the top left of the **WebData** tab. Click the `Update From Web` button to fetch the data into the table and dynamically update the plot on the **PPS Chart** tab. If the switch under study has only eight ports, the extra ports will be hidden automatically. 
 
-The name of the switch and the metric plotted appears in the title of the chart. Once the metrics have been loaded into the table, the different metrics may be loaded into the chart by selecting from the choices in the dropdown cell next to the ‘Chart metric` label. Moving between theses metrics for the same switch does *not* require doing another `Update From Web` operation.
+The name of the switch and the metric plotted appears in the title of the chart. Once the metrics have been loaded into the table, the different metrics may be loaded into the chart by selecting from the choices in the dropdown cell next to the 'Chart metric` label. Moving between theses metrics for the same switch does *not* require doing another `Update From Web` operation.
 
 The table on the **LocalPortNames* tab allows you to override the default port names shown in the chart. This table is entirely optional and defining entries for all ports on a given switch is *not* required (it is perfectly fine to define port name overrides for just a couple ports for a given switch). If you have multiple switches, you can add entries for all of them in a single table.
 
